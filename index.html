@@ -195,7 +195,6 @@
         <div class="subtitle" id="statusLine">Starter…</div>
       </div>
     </div>
-    <button class="btn ghost" id="btnMenu" aria-label="Meny">☰</button>
   </header>
 
   <main class="container">
@@ -210,12 +209,7 @@
 
     <section class="panel" data-view="dashboard">
       <h1>Oversikt</h1>
-      <p class="muted">
-        Plattformen er tilbake (lisens, moduler, backup, tester). “Arbeid” viser aktive moduler.
-      </p>
-      <div class="note" style="margin:10px 0 0">
-        Betaling er ikke aktivert ennå — men moduler er betalingsklare med lisensstatus og avhengigheter.
-      </div>
+      <p class="muted">Produksjonsnøytral modulplattform. Bruk “Arbeid” for aktive moduler.</p>
 
       <div class="card">
         <h2>Nøkkeltall</h2>
@@ -229,20 +223,20 @@
             <div class="kpiValue" id="kpiUpdatedAt">—</div>
           </div>
           <div class="kpi">
-            <div class="kpiLabel">Areal dyrket (daa)</div>
-            <div class="kpiValue" id="kpiDyrket">—</div>
+            <div class="kpiLabel">Areal total (daa)</div>
+            <div class="kpiValue" id="kpiTotalDaa">—</div>
           </div>
           <div class="kpi">
-            <div class="kpiLabel">Areal beite (daa)</div>
-            <div class="kpiValue" id="kpiBeite">—</div>
+            <div class="kpiLabel">Aktive moduler</div>
+            <div class="kpiValue" id="kpiEnabledModules">—</div>
           </div>
           <div class="kpi">
-            <div class="kpiLabel">Areal utmark (daa)</div>
-            <div class="kpiValue" id="kpiUtmark">—</div>
+            <div class="kpiLabel">Loggposter</div>
+            <div class="kpiValue" id="kpiLogCount">—</div>
           </div>
           <div class="kpi">
-            <div class="kpiLabel">Versjon</div>
-            <div class="kpiValue" id="kpiVersion">—</div>
+            <div class="kpiLabel">Produksjoner (aktive)</div>
+            <div class="kpiValue" id="kpiProdCount">—</div>
           </div>
         </div>
       </div>
@@ -253,13 +247,13 @@
           <button class="btn" id="btnCreateFarm">Opprett/Nullstill gård</button>
           <button class="btn secondary" id="btnSaveFarm">Lagre nå</button>
         </div>
-        <p class="hint">Tips: Ta backup før nullstilling.</p>
+        <p class="hint">Ta backup før nullstilling.</p>
       </div>
     </section>
 
     <section class="panel hidden" data-view="work">
       <h1>Arbeid</h1>
-      <p class="muted">Her vises UI for aktive moduler (gratis + låst opp). Dette er “der appen faktisk brukes”.</p>
+      <p class="muted">Her vises UI for aktive moduler (gratis + låst opp).</p>
       <div id="workHost"></div>
     </section>
 
@@ -292,7 +286,7 @@
           <button class="btn" id="btnSaveFarm2">Lagre</button>
         </div>
 
-        <p class="hint">Detaljert areal (skifter) ligger i modul <b>Arealenheter/skifter</b> under “Arbeid”.</p>
+        <p class="hint">Detaljert areal, ressurser og logg ligger under “Arbeid”.</p>
       </div>
     </section>
 
@@ -338,10 +332,8 @@
       <h1>Moduler</h1>
 
       <div class="card">
-        <h2>Modulbutikk (klar for betaling senere)</h2>
-        <p class="muted">
-          Gratis-moduler er tilgjengelige. Betalte moduler vises som “Låst” og kan låses opp per modul.
-        </p>
+        <h2>Modulbutikk</h2>
+        <p class="muted">Gratis-moduler er tilgjengelige. Betalte moduler kan låses opp per modul.</p>
         <div class="note" style="margin-top:10px">
           Demo-opplåsing: bruk kode <b>DEMO-OPEN</b>. Senere bytter vi dette til ekte betaling.
         </div>
@@ -396,7 +388,7 @@
       // =========================
       //  APP / DB BASICS
       // =========================
-      const APP_VERSION = "0.3.0";
+      const APP_VERSION = "0.4.0";
       const DB_NAME = "farmapp_db";
       const DB_VERSION = 2;
       const STORE = "documents";
@@ -578,6 +570,7 @@
         renderModules();
         renderTestModuleSelect();
         renderWork();
+        renderKPIs();
       }
 
       async function applyActivationCode(moduleId, code) {
@@ -592,8 +585,10 @@
       }
 
       // =========================
-      //  MODULES (FREE + PAID)
+      //  MODULES
       // =========================
+
+      // FREE: farm core
       ModuleRegistry.add({
         id: "farm.core",
         title: "Kjerne: Gård",
@@ -601,6 +596,7 @@
         priceModel: "free",
         defaultEnabled: true,
         dependsOn: [],
+        order: 10,
         dataPatch: (d) => {
           if (!d.farm.modules.core) d.farm.modules.core = { notes: "" };
         },
@@ -622,6 +618,7 @@
         ]
       });
 
+      // FREE: area core
       ModuleRegistry.add({
         id: "area.core",
         title: "Kjerne: Areal",
@@ -629,6 +626,7 @@
         priceModel: "free",
         defaultEnabled: true,
         dependsOn: ["farm.core"],
+        order: 20,
         dataPatch: (d) => { if (!d.farm.modules.area) d.farm.modules.area = {}; },
         validate: () => ({ ok:true, errors:[] }),
         calc: (d) => {
@@ -646,40 +644,393 @@
         ]
       });
 
+      // FREE: resources core (UPGRADED with UI)
       ModuleRegistry.add({
         id: "resources.core",
         title: "Kjerne: Ressurser",
-        description: "Arbeidstimer, maskiner og bygg (grunnstruktur).",
+        description: "Arbeidstimer, maskiner og bygg (enkelt register).",
         priceModel: "free",
         defaultEnabled: false,
         dependsOn: ["farm.core"],
+        order: 30,
         dataPatch: (d) => {
-          if (!d.farm.modules.resources) d.farm.modules.resources = { labor:{hoursPerWeek:0}, machines:[], buildings:[] };
+          if (!d.farm.modules.resources) d.farm.modules.resources = {
+            labor:{hoursPerWeek:0},
+            machines: [],
+            buildings: []
+          };
         },
-        validate: () => ({ ok:true, errors:[] }),
-        calc: () => ({ ok:true }),
-        ui: null,
+        validate: (d) => {
+          const errors = [];
+          const r = d?.farm?.modules?.resources;
+          if (!r) return { ok:false, errors:["resources mangler."] };
+          if (typeof r.labor?.hoursPerWeek !== "number" || r.labor.hoursPerWeek < 0) errors.push("Labor hoursPerWeek må være ≥ 0.");
+          if (!Array.isArray(r.machines)) errors.push("machines må være liste.");
+          if (!Array.isArray(r.buildings)) errors.push("buildings må være liste.");
+          return { ok: errors.length === 0, errors };
+        },
+        calc: (d) => {
+          const r = d.farm.modules.resources;
+          return {
+            hoursPerWeek: r?.labor?.hoursPerWeek ?? 0,
+            machines: (r?.machines || []).length,
+            buildings: (r?.buildings || []).length
+          };
+        },
+        ui: {
+          render: (host, d, results, api) => {
+            const r = d.farm.modules.resources;
+
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+              <h2>Ressurser</h2>
+              <p class="muted">Registrer kapasitet og ressurser. Senere bruker optimalisering dette som begrensning.</p>
+              <div class="grid3" style="margin-top:10px">
+                <label class="field">
+                  <span>Arbeidstimer per uke</span>
+                  <input id="resHours" type="number" min="0" step="0.5" />
+                </label>
+                <div class="kpi">
+                  <div class="kpiLabel">Maskiner</div>
+                  <div class="kpiValue">${results?.machines ?? 0}</div>
+                </div>
+                <div class="kpi">
+                  <div class="kpiLabel">Bygg</div>
+                  <div class="kpiValue">${results?.buildings ?? 0}</div>
+                </div>
+              </div>
+              <div class="row" style="margin-top:10px">
+                <button class="btn secondary" id="btnSaveRes">Lagre ressurser</button>
+              </div>
+            `;
+
+            // Set + save hours
+            const inp = card.querySelector("#resHours");
+            inp.value = String(r.labor.hoursPerWeek ?? 0);
+            card.querySelector("#btnSaveRes").addEventListener("click", async () => {
+              r.labor.hoursPerWeek = Number(inp.value);
+              await api.saveAndRefresh();
+            });
+
+            // Machines
+            const machineCard = document.createElement("div");
+            machineCard.className = "card";
+            machineCard.innerHTML = `
+              <h2>Maskiner</h2>
+              <div id="machineRows"></div>
+              <div class="row" style="margin-top:10px">
+                <button class="btn" id="btnAddMachine">Legg til maskin</button>
+                <button class="btn danger" id="btnClearMachines">Slett alle</button>
+              </div>
+            `;
+            const mHost = machineCard.querySelector("#machineRows");
+            for (let i=0;i<r.machines.length;i++){
+              const m = r.machines[i];
+              const row = document.createElement("div");
+              row.className = "moduleRow";
+              row.innerHTML = `
+                <div class="moduleMeta">
+                  <div class="moduleTitle">${escapeHtml(m.name || "Maskin")}</div>
+                  <div class="small">${escapeHtml(m.type || "type?")} · ${escapeHtml(m.note || "")}</div>
+                </div>
+                <div class="moduleRight">
+                  <div class="moduleActions">
+                    <button class="btn secondary" data-act="edit">Rediger</button>
+                    <button class="btn danger" data-act="del">Slett</button>
+                  </div>
+                </div>
+              `;
+              row.querySelector('[data-act="del"]').addEventListener("click", async () => {
+                if (!confirm("Slette maskinen?")) return;
+                r.machines.splice(i,1);
+                await api.saveAndRefresh();
+              });
+              row.querySelector('[data-act="edit"]').addEventListener("click", () => {
+                api.openEditor({
+                  title: "Rediger maskin",
+                  subtitle: "Enkelt register. Service/vedlikehold kommer senere.",
+                  fields: [
+                    { key:"name", label:"Navn", type:"text" },
+                    { key:"type", label:"Type", type:"text" },
+                    { key:"note", label:"Merknad", type:"text" }
+                  ],
+                  value: m,
+                  onSave: async (nv) => {
+                    r.machines[i] = { ...m, ...nv };
+                    await api.saveAndRefresh();
+                  }
+                });
+              });
+              mHost.appendChild(row);
+            }
+            machineCard.querySelector("#btnAddMachine").addEventListener("click", async () => {
+              r.machines.push({
+                id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()),
+                name: `Maskin ${r.machines.length+1}`,
+                type: "Traktor / Redskap / Annet",
+                note: ""
+              });
+              await api.saveAndRefresh();
+            });
+            machineCard.querySelector("#btnClearMachines").addEventListener("click", async () => {
+              if (!confirm("Slette alle maskiner?")) return;
+              r.machines = [];
+              await api.saveAndRefresh();
+            });
+
+            // Buildings
+            const bCard = document.createElement("div");
+            bCard.className = "card";
+            bCard.innerHTML = `
+              <h2>Bygg</h2>
+              <div id="buildingRows"></div>
+              <div class="row" style="margin-top:10px">
+                <button class="btn" id="btnAddBuilding">Legg til bygg</button>
+                <button class="btn danger" id="btnClearBuildings">Slett alle</button>
+              </div>
+            `;
+            const bHost = bCard.querySelector("#buildingRows");
+            for (let i=0;i<r.buildings.length;i++){
+              const b = r.buildings[i];
+              const row = document.createElement("div");
+              row.className = "moduleRow";
+              row.innerHTML = `
+                <div class="moduleMeta">
+                  <div class="moduleTitle">${escapeHtml(b.name || "Bygg")}</div>
+                  <div class="small">${escapeHtml(b.type || "type?")} · ${escapeHtml(b.note || "")}</div>
+                </div>
+                <div class="moduleRight">
+                  <div class="moduleActions">
+                    <button class="btn secondary" data-act="edit">Rediger</button>
+                    <button class="btn danger" data-act="del">Slett</button>
+                  </div>
+                </div>
+              `;
+              row.querySelector('[data-act="del"]').addEventListener("click", async () => {
+                if (!confirm("Slette bygget?")) return;
+                r.buildings.splice(i,1);
+                await api.saveAndRefresh();
+              });
+              row.querySelector('[data-act="edit"]').addEventListener("click", () => {
+                api.openEditor({
+                  title: "Rediger bygg",
+                  subtitle: "Enkelt register. Kapasitet/energibruk kan legges på senere.",
+                  fields: [
+                    { key:"name", label:"Navn", type:"text" },
+                    { key:"type", label:"Type", type:"text" },
+                    { key:"note", label:"Merknad", type:"text" }
+                  ],
+                  value: b,
+                  onSave: async (nv) => {
+                    r.buildings[i] = { ...b, ...nv };
+                    await api.saveAndRefresh();
+                  }
+                });
+              });
+              bHost.appendChild(row);
+            }
+            bCard.querySelector("#btnAddBuilding").addEventListener("click", async () => {
+              r.buildings.push({
+                id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()),
+                name: `Bygg ${r.buildings.length+1}`,
+                type: "Fjøs / Lager / Annet",
+                note: ""
+              });
+              await api.saveAndRefresh();
+            });
+            bCard.querySelector("#btnClearBuildings").addEventListener("click", async () => {
+              if (!confirm("Slette alle bygg?")) return;
+              r.buildings = [];
+              await api.saveAndRefresh();
+            });
+
+            host.appendChild(card);
+            host.appendChild(machineCard);
+            host.appendChild(bCard);
+          }
+        },
         tests: [
           { name: "resources.core: dataPatch", run: () => {
             const d = createNewFarm();
             ModuleRegistry.get("resources.core").dataPatch(d);
             if (!d.farm.modules.resources?.labor) throw new Error("Mangler labor");
+          }},
+          { name: "resources.core: validate hours >= 0", run: () => {
+            const d = createNewFarm();
+            ModuleRegistry.get("resources.core").dataPatch(d);
+            d.farm.modules.resources.labor.hoursPerWeek = -1;
+            const v = ModuleRegistry.get("resources.core").validate(d);
+            if (v.ok) throw new Error("Skulle feile ved negative timer");
           }}
         ]
       });
 
-      // PAID: areal units (skifter)
+      // FREE: log module (universal)
+      ModuleRegistry.add({
+        id: "log.core",
+        title: "Logg: Hendelser",
+        description: "Universell hendelseslogg for drift, vedlikehold, avvik, notater osv.",
+        priceModel: "free",
+        defaultEnabled: false,
+        dependsOn: ["farm.core"],
+        order: 40,
+        dataPatch: (d) => {
+          if (!d.farm.modules.log) d.farm.modules.log = { entries: [] };
+        },
+        validate: (d) => {
+          const errors = [];
+          const log = d?.farm?.modules?.log;
+          if (!log || !Array.isArray(log.entries)) return { ok:false, errors:["log.entries må finnes (liste)."] };
+          for (let i=0;i<log.entries.length;i++){
+            const e = log.entries[i];
+            if (!e?.id) errors.push(`Entry ${i+1}: id mangler.`);
+            if (!e?.date) errors.push(`Entry ${i+1}: dato mangler.`);
+            if (typeof e?.category !== "string") errors.push(`Entry ${i+1}: kategori må være tekst.`);
+            if (typeof e?.text !== "string" || !e.text.trim()) errors.push(`Entry ${i+1}: tekst mangler.`);
+          }
+          return { ok: errors.length===0, errors };
+        },
+        calc: (d) => {
+          const n = d.farm.modules.log?.entries?.length ?? 0;
+          return { count: n };
+        },
+        ui: {
+          render: (host, d, results, api) => {
+            const log = d.farm.modules.log;
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+              <h2>Hendelseslogg</h2>
+              <p class="muted">Legg inn hva som er gjort, når og hvorfor. Dette kan brukes til rapporter senere.</p>
+              <div class="grid2" style="margin-top:10px">
+                <div class="kpi"><div class="kpiLabel">Antall poster</div><div class="kpiValue">${results?.count ?? 0}</div></div>
+                <div class="note">Tips: Bruk kategorier som “Vedlikehold”, “Sprøyting”, “Slått”, “Avvik”, “Notat”.</div>
+              </div>
+            `;
+
+            const list = document.createElement("div");
+            list.className = "card";
+            list.innerHTML = `<h2>Poster</h2><div id="logRows"></div>`;
+            const rowsHost = list.querySelector("#logRows");
+
+            const btnRow = document.createElement("div");
+            btnRow.className = "row";
+            btnRow.style.marginTop = "10px";
+
+            const btnAdd = document.createElement("button");
+            btnAdd.className = "btn";
+            btnAdd.textContent = "Ny loggpost";
+            btnAdd.addEventListener("click", async () => {
+              log.entries.unshift({
+                id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()),
+                date: nowIso().slice(0,10),
+                category: "Notat",
+                text: ""
+              });
+              // open editor right away
+              api.openEditor({
+                title: "Ny loggpost",
+                subtitle: "Skriv kort og konkret.",
+                fields: [
+                  { key:"date", label:"Dato (YYYY-MM-DD)", type:"text" },
+                  { key:"category", label:"Kategori", type:"text" },
+                  { key:"text", label:"Tekst", type:"text" }
+                ],
+                value: log.entries[0],
+                onSave: async (nv) => {
+                  log.entries[0] = { ...log.entries[0], ...nv };
+                  await api.saveAndRefresh();
+                }
+              });
+              await api.saveAndRefresh();
+            });
+
+            const btnClear = document.createElement("button");
+            btnClear.className = "btn danger";
+            btnClear.textContent = "Slett alle";
+            btnClear.addEventListener("click", async () => {
+              if (!confirm("Slette alle loggposter?")) return;
+              log.entries = [];
+              await api.saveAndRefresh();
+            });
+
+            btnRow.appendChild(btnAdd);
+            btnRow.appendChild(btnClear);
+            list.appendChild(btnRow);
+
+            for (let i=0;i<log.entries.length;i++){
+              const e = log.entries[i];
+              const row = document.createElement("div");
+              row.className = "moduleRow";
+              row.innerHTML = `
+                <div class="moduleMeta">
+                  <div class="moduleTitle">${escapeHtml(e.category || "Logg")}</div>
+                  <div class="small">${escapeHtml(e.date || "")}</div>
+                  <div class="moduleDesc">${escapeHtml((e.text||"").slice(0,120))}${(e.text||"").length>120?"…":""}</div>
+                </div>
+                <div class="moduleRight">
+                  <div class="moduleActions">
+                    <button class="btn secondary" data-act="edit">Rediger</button>
+                    <button class="btn danger" data-act="del">Slett</button>
+                  </div>
+                </div>
+              `;
+              row.querySelector('[data-act="del"]').addEventListener("click", async () => {
+                if (!confirm("Slette denne posten?")) return;
+                log.entries.splice(i,1);
+                await api.saveAndRefresh();
+              });
+              row.querySelector('[data-act="edit"]').addEventListener("click", () => {
+                api.openEditor({
+                  title: "Rediger loggpost",
+                  subtitle: "Dato, kategori og tekst.",
+                  fields: [
+                    { key:"date", label:"Dato (YYYY-MM-DD)", type:"text" },
+                    { key:"category", label:"Kategori", type:"text" },
+                    { key:"text", label:"Tekst", type:"text" }
+                  ],
+                  value: e,
+                  onSave: async (nv) => {
+                    log.entries[i] = { ...e, ...nv };
+                    await api.saveAndRefresh();
+                  }
+                });
+              });
+              rowsHost.appendChild(row);
+            }
+
+            host.appendChild(card);
+            host.appendChild(list);
+          }
+        },
+        tests: [
+          { name: "log.core: dataPatch lager entries[]", run: () => {
+            const d = createNewFarm();
+            ModuleRegistry.get("log.core").dataPatch(d);
+            if (!Array.isArray(d.farm.modules.log.entries)) throw new Error("Mangler log.entries[]");
+          }},
+          { name: "log.core: validate feiler uten tekst", run: () => {
+            const d = createNewFarm();
+            ModuleRegistry.get("log.core").dataPatch(d);
+            d.farm.modules.log.entries = [{ id:"1", date:"2026-01-01", category:"Notat", text:"" }];
+            const v = ModuleRegistry.get("log.core").validate(d);
+            if (v.ok) throw new Error("Skulle feile uten tekst");
+          }}
+        ]
+      });
+
+      // PAID: area units (skifter)
       ModuleRegistry.add({
         id: "area.units",
         title: "Areal: Arealenheter / skifter",
-        description: "Detaljert arealstyring: skifter, beiteområder, utmark, veksthus osv. Summering, kontroll og datakvalitet.",
+        description: "Detaljert arealstyring: skifter, beiteområder, utmark, veksthus osv. Summering og kontroll.",
         priceModel: "paid",
         defaultEnabled: false,
         dependsOn: ["farm.core","area.core"],
+        order: 50,
         dataPatch: (d) => {
-          if (!d.farm.modules.areaUnits) {
-            d.farm.modules.areaUnits = { units: [] };
-          }
+          if (!d.farm.modules.areaUnits) d.farm.modules.areaUnits = { units: [] };
         },
         validate: (d) => {
           const errors = [];
@@ -692,14 +1043,12 @@
 
           for (let i=0;i<mod.units.length;i++){
             const u = mod.units[i];
-            if (!u || typeof u !== "object") { errors.push(`Enhet ${i+1}: ugyldig objekt.`); continue; }
-            if (!u.id) errors.push(`Enhet ${i+1}: id mangler.`);
-            if (typeof u.name !== "string" || !u.name.trim()) errors.push(`Enhet ${i+1}: navn mangler.`);
+            if (!u?.id) errors.push(`Enhet ${i+1}: id mangler.`);
+            if (typeof u?.name !== "string" || !u.name.trim()) errors.push(`Enhet ${i+1}: navn mangler.`);
             if (!allowedTypes.includes(u.type)) errors.push(`Enhet ${i+1}: ugyldig type.`);
             if (typeof u.areaDaa !== "number" || Number.isNaN(u.areaDaa) || u.areaDaa <= 0) errors.push(`Enhet ${i+1}: areal (daa) må være > 0.`);
             if (!allowedQuality.includes(u.quality)) errors.push(`Enhet ${i+1}: ugyldig kvalitet.`);
             if (!allowedUse.includes(u.use)) errors.push(`Enhet ${i+1}: ugyldig bruk.`);
-            if (u.note != null && typeof u.note !== "string") errors.push(`Enhet ${i+1}: merknad må være tekst.`);
           }
           return { ok: errors.length === 0, errors };
         },
@@ -720,7 +1069,6 @@
             innmarksbeite: sums.innmarksbeite - (base.beiteDaa||0),
             utmark: sums.utmark - (base.utmarkDaa||0)
           };
-
           return { sums, deltas };
         },
         ui: {
@@ -869,55 +1217,91 @@
             ];
             const r = ModuleRegistry.get("area.units").calc(d);
             if (r.sums.total !== 15) throw new Error("Forventet total 15");
-          }},
-          { name: "area.units: validering feiler uten navn", run: () => {
-            const d = createNewFarm();
-            ModuleRegistry.get("area.units").dataPatch(d);
-            d.farm.modules.areaUnits.units = [
-              {id:"1",name:"",type:"dyrket",areaDaa:10,quality:"ukjent",use:"annet",note:""}
-            ];
-            const v = ModuleRegistry.get("area.units").validate(d);
-            if (v.ok) throw new Error("Skulle feile uten navn");
-          }},
-          { name: "area.units: validering feiler ved 0 daa", run: () => {
-            const d = createNewFarm();
-            ModuleRegistry.get("area.units").dataPatch(d);
-            d.farm.modules.areaUnits.units = [
-              {id:"1",name:"A",type:"dyrket",areaDaa:0,quality:"ukjent",use:"annet",note:""}
-            ];
-            const v = ModuleRegistry.get("area.units").validate(d);
-            if (v.ok) throw new Error("Skulle feile ved 0 daa");
-          }},
-          { name: "area.units: delta mot grunnareal", run: () => {
-            const d = createNewFarm();
-            d.farm.area = { dyrketDaa: 10, beiteDaa: 2, utmarkDaa: 80 };
-            ModuleRegistry.get("area.units").dataPatch(d);
-            d.farm.modules.areaUnits.units = [
-              {id:"1",name:"A",type:"dyrket",areaDaa:12,quality:"ukjent",use:"annet",note:""},
-              {id:"2",name:"B",type:"innmarksbeite",areaDaa:2,quality:"ukjent",use:"annet",note:""},
-              {id:"3",name:"C",type:"utmark",areaDaa:79,quality:"ukjent",use:"annet",note:""}
-            ];
-            const r = ModuleRegistry.get("area.units").calc(d);
-            if (r.deltas.dyrket !== 2) throw new Error("Forventet dyrket delta 2");
-            if (r.deltas.innmarksbeite !== 0) throw new Error("Forventet beite delta 0");
-            if (r.deltas.utmark !== -1) throw new Error("Forventet utmark delta -1");
           }}
         ]
       });
 
-      // (Placeholder paid modules to show store structure)
+      // PAID: productions profiles (universal)
       ModuleRegistry.add({
         id: "productions.core",
         title: "Produksjonsprofiler",
-        description: "Aktiver korn/melk/grønt osv. Styrer hvilke felter og KPI-er som vises.",
+        description: "Aktiver hva gården driver med (korn, melk, grønt, frukt/bær, svin, fjørfe, foredling osv.).",
         priceModel: "paid",
         defaultEnabled: false,
         dependsOn: ["farm.core"],
-        dataPatch: (d) => { if (!d.farm.modules.productions) d.farm.modules.productions = { active: [], settings: {} }; },
-        validate: () => ({ ok:true, errors:[] }),
+        order: 60,
+        dataPatch: (d) => {
+          if (!d.farm.modules.productions) d.farm.modules.productions = { active: [], settings: {} };
+        },
+        validate: (d) => {
+          const p = d?.farm?.modules?.productions;
+          if (!p || !Array.isArray(p.active)) return { ok:false, errors:["productions.active må være liste."] };
+          return { ok:true, errors:[] };
+        },
         calc: (d) => ({ active: d.farm.modules.productions?.active || [] }),
-        ui: null,
-        tests: [{ name: "productions.core: placeholder", run: () => {} }]
+        ui: {
+          render: (host, d, results, api) => {
+            const p = d.farm.modules.productions;
+            const catalog = [
+              { id:"korn", name:"Korn" },
+              { id:"grovfor", name:"Grovfôr" },
+              { id:"melk", name:"Melk" },
+              { id:"kjott", name:"Kjøtt" },
+              { id:"gronnsaker", name:"Grønnsaker" },
+              { id:"fruktbaer", name:"Frukt/bær" },
+              { id:"svin", name:"Svin" },
+              { id:"fjorfe", name:"Fjørfe" },
+              { id:"foredling", name:"Foredling" }
+            ];
+
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+              <h2>Produksjonsprofiler</h2>
+              <p class="muted">Velg hvilke produksjoner som er relevante. Dette styrer hva appen viser senere.</p>
+              <div class="small">Aktive: <b>${(results?.active || []).length}</b></div>
+            `;
+
+            const list = document.createElement("div");
+            list.className = "card";
+            list.innerHTML = `<h2>Velg produksjoner</h2><div id="prodRows"></div>`;
+            const rows = list.querySelector("#prodRows");
+
+            for (const item of catalog) {
+              const on = (p.active || []).includes(item.id);
+              const row = document.createElement("div");
+              row.className = "moduleRow";
+              row.innerHTML = `
+                <div class="moduleMeta">
+                  <div class="moduleTitle">${escapeHtml(item.name)}</div>
+                  <div class="small">${escapeHtml(item.id)}</div>
+                </div>
+                <div class="moduleRight">
+                  <div class="moduleActions">
+                    <button class="btn ${on ? "secondary" : ""}" data-act="toggle">${on ? "Deaktiver" : "Aktiver"}</button>
+                  </div>
+                </div>
+              `;
+              row.querySelector('[data-act="toggle"]').addEventListener("click", async () => {
+                const idx = p.active.indexOf(item.id);
+                if (idx >= 0) p.active.splice(idx,1);
+                else p.active.push(item.id);
+                await api.saveAndRefresh();
+              });
+              rows.appendChild(row);
+            }
+
+            host.appendChild(card);
+            host.appendChild(list);
+          }
+        },
+        tests: [
+          { name: "productions.core: dataPatch", run: () => {
+            const d = createNewFarm();
+            ModuleRegistry.get("productions.core").dataPatch(d);
+            if (!Array.isArray(d.farm.modules.productions.active)) throw new Error("Mangler active[]");
+          }}
+        ]
       });
 
       // =========================
@@ -1031,13 +1415,19 @@
 
       function renderKPIs() {
         const d = state.farmData;
-        $("#kpiVersion").textContent = APP_VERSION;
         if (!d) return;
+
+        const areaTotal = (d.farm.area.dyrketDaa||0) + (d.farm.area.beiteDaa||0) + (d.farm.area.utmarkDaa||0);
+        const enabledCount = Object.values(state.modulePrefs || {}).filter(x => x?.enabled).length;
+        const logCount = d.farm.modules.log?.entries?.length ?? 0;
+        const prodCount = d.farm.modules.productions?.active?.length ?? 0;
+
         $("#kpiFarmName").textContent = d.farm.name ?? "—";
         $("#kpiUpdatedAt").textContent = fmtDate(d.meta.updatedAt);
-        $("#kpiDyrket").textContent = String(d.farm.area.dyrketDaa ?? 0);
-        $("#kpiBeite").textContent = String(d.farm.area.beiteDaa ?? 0);
-        $("#kpiUtmark").textContent = String(d.farm.area.utmarkDaa ?? 0);
+        $("#kpiTotalDaa").textContent = String(areaTotal);
+        $("#kpiEnabledModules").textContent = String(enabledCount);
+        $("#kpiLogCount").textContent = String(logCount);
+        $("#kpiProdCount").textContent = String(prodCount);
       }
 
       async function saveFarm() {
@@ -1057,9 +1447,8 @@
         if (errors.length) { alert("Kan ikke lagre:\n\n" + errors.join("\n")); return; }
 
         await dbSet(FARM_KEY, state.farmData);
-        renderKPIs();
-        renderWork();
         setStatus("Lagret ✅");
+        renderKPIs();
       }
 
       async function resetFarm() {
@@ -1079,10 +1468,10 @@
         await dbSet(MODULE_PREFS_KEY, state.modulePrefs);
 
         syncFarmToForm();
-        renderKPIs();
         renderModules();
         renderTestModuleSelect();
         renderWork();
+        renderKPIs();
         setStatus("Ny gård opprettet ✅");
       }
 
@@ -1142,16 +1531,16 @@
         await dbSet(MODULE_PREFS_KEY, state.modulePrefs);
 
         syncFarmToForm();
-        renderKPIs();
         renderModules();
         renderTestModuleSelect();
         renderWork();
+        renderKPIs();
         setStatus("Importert ✅");
         input.value = "";
       }
 
       // =========================
-      //  MODULE MANAGER UI
+      //  MODULE STORE UI
       // =========================
       function priceText(m) {
         if (m.priceModel === "free") return "Gratis";
@@ -1164,7 +1553,9 @@
         const host = $("#modulesList");
         host.innerHTML = "";
 
-        for (const m of ModuleRegistry.list()) {
+        const sorted = ModuleRegistry.list().slice().sort((a,b) => (a.order||999)-(b.order||999));
+
+        for (const m of sorted) {
           const lic = licenseLabel(m.id);
           const enabled = isEnabled(m.id);
           const allowed = licenseAllows(m.id) || m.priceModel === "free";
@@ -1235,14 +1626,18 @@
       }
 
       // =========================
-      //  WORKBENCH (render active module UIs)
+      //  WORKBENCH
       // =========================
       function renderWork() {
         const host = $("#workHost");
         host.innerHTML = "";
 
-        const active = ModuleRegistry.list().filter(m => isEnabled(m.id));
-        if (!active.length) {
+        const enabledModules = ModuleRegistry.list()
+          .filter(m => isEnabled(m.id))
+          .slice()
+          .sort((a,b) => (a.order||999)-(b.order||999));
+
+        if (!enabledModules.length) {
           const c = document.createElement("div");
           c.className = "card";
           c.innerHTML = `<h2>Ingen aktive moduler</h2><p class="muted">Gå til “Moduler” og skru på ønskede moduler.</p>`;
@@ -1254,23 +1649,21 @@
           saveAndRefresh: async () => {
             await saveFarm();
             renderWork();
+            renderKPIs();
           },
           openEditor
         };
 
-        for (const m of active) {
+        for (const m of enabledModules) {
           const allowed = licenseAllows(m.id) || m.priceModel === "free";
 
-          // Always patch before rendering
           if (allowed && typeof m.dataPatch === "function") m.dataPatch(state.farmData);
 
-          // Compute results if allowed
           let results = null;
           if (allowed && typeof m.calc === "function") {
             try { results = m.calc(state.farmData); } catch { results = null; }
           }
 
-          // Card wrapper
           const wrap = document.createElement("div");
           wrap.className = "card";
           const lic = licenseLabel(m.id);
@@ -1291,8 +1684,7 @@
           const body = wrap.querySelector("[data-body]");
           if (!allowed) {
             body.innerHTML = `<p class="muted">Denne modulen er låst. Lås opp for å bruke den.</p>`;
-            const b = wrap.querySelector("[data-unlock]");
-            b.addEventListener("click", () => openLicenseModal(m.id));
+            wrap.querySelector("[data-unlock]").addEventListener("click", () => openLicenseModal(m.id));
           } else if (m.ui && typeof m.ui.render === "function") {
             m.ui.render(body, state.farmData, results, api);
           } else {
@@ -1355,7 +1747,9 @@
         optAll.value = "ALL";
         optAll.textContent = "Alle moduler";
         sel.appendChild(optAll);
-        for (const m of ModuleRegistry.list()) {
+
+        const sorted = ModuleRegistry.list().slice().sort((a,b) => (a.order||999)-(b.order||999));
+        for (const m of sorted) {
           const opt = document.createElement("option");
           opt.value = m.id;
           opt.textContent = `${m.title} (${m.id})`;
@@ -1391,10 +1785,10 @@
         await dbSet(MODULE_PREFS_KEY, state.modulePrefs);
 
         syncFarmToForm();
-        renderKPIs();
         renderModules();
         renderTestModuleSelect();
         renderWork();
+        renderKPIs();
       }
 
       // =========================
@@ -1403,31 +1797,27 @@
       function wireUI() {
         $$("#tabs .tab").forEach(b => b.addEventListener("click", () => routeTo(b.dataset.route)));
 
-        // Save/reset
         $("#btnCreateFarm").addEventListener("click", () => {
           if (confirm("Dette nullstiller gården i appen. Ta backup først hvis du vil!\n\nFortsette?")) resetFarm();
         });
-        $("#btnSaveFarm").addEventListener("click", saveFarm);
-        $("#btnSaveFarm2").addEventListener("click", saveFarm);
+        $("#btnSaveFarm").addEventListener("click", async () => { await saveFarm(); renderWork(); renderKPIs(); });
+        $("#btnSaveFarm2").addEventListener("click", async () => { await saveFarm(); renderWork(); renderKPIs(); });
 
         ["#farmName","#areaDyrket","#areaBeite","#areaUtmark"].forEach(id => {
-          $(id).addEventListener("change", () => saveFarm());
+          $(id).addEventListener("change", async () => { await saveFarm(); renderWork(); renderKPIs(); });
         });
 
-        // Backup
         $("#btnExport").addEventListener("click", exportBackup);
         $("#btnImport").addEventListener("click", () => {
           if (confirm("Import overskriver gjeldende gård i appen.\n\nFortsette?")) importBackup();
         });
 
-        // Tests
         $("#btnRunTestsAll").addEventListener("click", () => runTests("ALL"));
         $("#btnRunTestsModule").addEventListener("click", () => {
           const id = $("#testModuleSelect").value || "ALL";
           runTests(id);
         });
 
-        // License modal
         $("#licenseOverlayBg").addEventListener("click", closeLicenseModal);
         $("#btnCancelLicense").addEventListener("click", closeLicenseModal);
         $("#btnApplyLicense").addEventListener("click", async () => {
@@ -1441,7 +1831,6 @@
           closeLicenseModal();
         });
 
-        // Editor modal
         $("#editorOverlayBg").addEventListener("click", closeEditor);
         $("#btnEditorCancel").addEventListener("click", closeEditor);
         $("#btnEditorSave").addEventListener("click", async () => {
