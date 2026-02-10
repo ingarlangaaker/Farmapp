@@ -19,7 +19,6 @@
       --radius:16px;
       --pad:14px;
       --max: 980px;
-      font-synthesis-weight: none;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -37,21 +36,20 @@
       background: rgba(11,15,20,.85);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--line);
+      gap:10px;
     }
-    .brand{display:flex; gap:12px; align-items:center}
+    .brand{display:flex; gap:12px; align-items:center; min-width:0}
     .dot{width:14px; height:14px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 6px rgba(0,180,90,.12)}
-    .title{font-weight:700; letter-spacing:.2px}
-    .subtitle{font-size:12px; color:var(--muted); margin-top:2px}
+    .title{font-weight:800; letter-spacing:.2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+    .subtitle{font-size:12px; color:var(--muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 
     .container{max-width:var(--max); margin:0 auto; padding: 14px}
-    .tabs{
-      display:flex; gap:8px; overflow:auto; padding-bottom:10px;
-    }
+    .tabs{display:flex; gap:8px; overflow:auto; padding-bottom:10px;}
     .tab{
       border:1px solid var(--line);
       background:transparent; color:var(--text);
       padding:10px 12px; border-radius:999px;
-      white-space:nowrap; font-weight:600;
+      white-space:nowrap; font-weight:700;
     }
     .tab.active{border-color: rgba(0,180,90,.65); background: rgba(0,180,90,.12)}
 
@@ -59,7 +57,6 @@
     .hidden{display:none}
     h1{font-size:22px; margin: 14px 2px}
     h2{font-size:16px; margin: 0 0 10px}
-    h3{margin:0 0 10px}
     .muted{color:var(--muted); line-height:1.4}
     .hint{color:var(--muted); font-size:12px; line-height:1.35; margin-top:10px}
     .card{
@@ -73,12 +70,7 @@
     .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
     .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
     .grid3{display:grid; grid-template-columns:1fr; gap:10px}
-    @media (min-width: 700px){
-      .grid3{grid-template-columns:1fr 1fr 1fr}
-    }
-    .kpi{padding:12px; border:1px solid var(--line); border-radius:14px; background: rgba(0,0,0,.12)}
-    .kpiLabel{font-size:12px; color:var(--muted)}
-    .kpiValue{font-size:18px; font-weight:750; margin-top:4px}
+    @media (min-width: 700px){ .grid3{grid-template-columns:1fr 1fr 1fr} }
 
     .field{display:flex; flex-direction:column; gap:6px}
     .field span{font-size:12px; color:var(--muted)}
@@ -90,6 +82,7 @@
       color: var(--text);
       font-size:16px;
     }
+    textarea{min-height:110px; resize:vertical}
     input:focus, select:focus, textarea:focus{
       outline:none; border-color: rgba(0,180,90,.7); box-shadow: 0 0 0 4px rgba(0,180,90,.12)
     }
@@ -100,35 +93,17 @@
       border: 1px solid rgba(0,180,90,.6);
       background: rgba(0,180,90,.16);
       color: var(--text);
-      font-weight: 700;
+      font-weight: 800;
     }
-    .btn.secondary{
-      border-color: rgba(138,160,181,.6);
-      background: rgba(138,160,181,.12);
-    }
-    .btn.danger{
-      border-color: rgba(212,68,68,.8);
-      background: rgba(212,68,68,.14);
-    }
-    .btn.ghost{
-      border-color: var(--line);
-      background: transparent;
-    }
-    .btn.full{width:100%; justify-content:center}
-
-    .results{margin-top:12px}
-    .resultItem{
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
-      margin:10px 0;
-      background: rgba(0,0,0,.12);
-    }
+    .btn.secondary{border-color: rgba(138,160,181,.6); background: rgba(138,160,181,.12);}
+    .btn.danger{border-color: rgba(212,68,68,.8); background: rgba(212,68,68,.14);}
+    .btn.ghost{border-color: var(--line); background: transparent;}
+    .btn.small{padding:8px 10px; border-radius:10px; font-weight:800; font-size:13px}
 
     .badge{
       display:inline-flex; align-items:center; gap:6px;
       padding:4px 10px; border-radius:999px;
-      font-size:12px; font-weight:800; letter-spacing:.2px;
+      font-size:12px; font-weight:900; letter-spacing:.2px;
       border:1px solid var(--line);
       white-space:nowrap;
     }
@@ -140,16 +115,6 @@
     .badge.off{border-color: rgba(138,160,181,.6); background: rgba(138,160,181,.08)}
     .small{font-size:12px; color:var(--muted); line-height:1.35; margin-top:8px}
 
-    .note{
-      border:1px dashed rgba(138,160,181,.5);
-      background: rgba(138,160,181,.07);
-      padding: 10px 12px;
-      border-radius: 14px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.35;
-    }
-
     .moduleRow{
       display:flex; gap:10px; align-items:flex-start; justify-content:space-between;
       padding:12px; border:1px solid var(--line); border-radius:14px;
@@ -157,17 +122,43 @@
       margin:10px 0;
     }
     .moduleMeta{min-width:0}
-    .moduleTitle{font-weight:900}
+    .moduleTitle{font-weight:950}
     .moduleDesc{color:var(--muted); font-size:12px; line-height:1.35; margin-top:4px}
     .moduleRight{display:flex; flex-direction:column; gap:8px; align-items:flex-end}
     .moduleActions{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
-    .pill{
-      display:inline-flex; gap:6px; align-items:center;
-      padding:4px 10px; border-radius:999px;
-      font-size:12px; font-weight:800;
-      border:1px solid var(--line);
-      color: var(--muted);
+
+    /* Kontrollpanel tiles */
+    .tileGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
     }
+    @media (min-width: 700px){ .tileGrid{ grid-template-columns: 1fr 1fr 1fr; } }
+    .tile{
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.12);
+      border-radius: 18px;
+      padding: 12px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      cursor:pointer;
+      user-select:none;
+      min-height:74px;
+      box-shadow: var(--shadow);
+    }
+    .tile:active{transform: translateY(1px)}
+    .tileIcon{
+      width:44px; height:44px; border-radius:14px;
+      border:1px solid rgba(0,180,90,.35);
+      background: rgba(0,180,90,.10);
+      display:flex; align-items:center; justify-content:center;
+      flex:0 0 auto;
+    }
+    .tileIcon svg{width:26px;height:26px;opacity:.95}
+    .tileText{min-width:0}
+    .tileTitle{font-weight:950; line-height:1.1}
+    .tileSub{font-size:12px; color:var(--muted); margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 
     .overlay.hidden{display:none}
     .overlay{position:fixed; inset:0; z-index:80}
@@ -184,83 +175,68 @@
     .modal h3{margin:0 0 8px}
     .modal .muted{margin:0 0 10px}
     hr{border:none; border-top:1px solid var(--line); margin:12px 0}
+
+    .note{
+      border:1px dashed rgba(138,160,181,.5);
+      background: rgba(138,160,181,.07);
+      padding: 10px 12px;
+      border-radius: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
   </style>
 </head>
 <body>
   <header class="topbar">
+    <button class="btn ghost" id="btnMinGard" aria-label="Min gård">⚙ Min gård</button>
+
     <div class="brand">
       <div class="dot"></div>
-      <div>
-        <div class="title">Gårdsapp</div>
+      <div style="min-width:0">
+        <div class="title" id="topTitle">Gårdsapp</div>
         <div class="subtitle" id="statusLine">Starter…</div>
       </div>
     </div>
+
+    <button class="btn ghost" id="btnPanelSetup" aria-label="Kontrollpanel">🧩 Panel</button>
   </header>
 
   <main class="container">
     <nav class="tabs" id="tabs">
-      <button class="tab active" data-route="dashboard">Oversikt</button>
+      <button class="tab active" data-route="dashboard">Kontrollpanel</button>
       <button class="tab" data-route="work">Arbeid</button>
-      <button class="tab" data-route="farm">Gård</button>
       <button class="tab" data-route="backup">Backup</button>
       <button class="tab" data-route="tests">Selvtest</button>
       <button class="tab" data-route="modules">Moduler</button>
     </nav>
 
+    <!-- KONTROLLPANEL -->
     <section class="panel" data-view="dashboard">
-      <h1>Oversikt</h1>
-      <p class="muted">Produksjonsnøytral modulplattform. Bruk “Arbeid” for aktive moduler.</p>
+      <h1>Kontrollpanel</h1>
+      <p class="muted">Hurtigtaster for det du gjør ofte. Du bestemmer hva som vises og rekkefølgen (🧩 Panel).</p>
 
       <div class="card">
-        <h2>Nøkkeltall</h2>
-        <div class="grid2">
-          <div class="kpi">
-            <div class="kpiLabel">Gårdsnavn</div>
-            <div class="kpiValue" id="kpiFarmName">—</div>
-          </div>
-          <div class="kpi">
-            <div class="kpiLabel">Sist lagret</div>
-            <div class="kpiValue" id="kpiUpdatedAt">—</div>
-          </div>
-          <div class="kpi">
-            <div class="kpiLabel">Areal total (daa)</div>
-            <div class="kpiValue" id="kpiTotalDaa">—</div>
-          </div>
-          <div class="kpi">
-            <div class="kpiLabel">Aktive moduler</div>
-            <div class="kpiValue" id="kpiEnabledModules">—</div>
-          </div>
-          <div class="kpi">
-            <div class="kpiLabel">Loggposter</div>
-            <div class="kpiValue" id="kpiLogCount">—</div>
-          </div>
-          <div class="kpi">
-            <div class="kpiLabel">Produksjoner (aktive)</div>
-            <div class="kpiValue" id="kpiProdCount">—</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Hurtigvalg</h2>
-        <div class="row">
-          <button class="btn" id="btnCreateFarm">Opprett/Nullstill gård</button>
-          <button class="btn secondary" id="btnSaveFarm">Lagre nå</button>
-        </div>
-        <p class="hint">Ta backup før nullstilling.</p>
+        <h2>Hurtigtaster</h2>
+        <div id="dashboardTiles" class="tileGrid"></div>
+        <div class="small" id="dashboardHint"></div>
       </div>
     </section>
 
+    <!-- ARBEID -->
     <section class="panel hidden" data-view="work">
       <h1>Arbeid</h1>
       <p class="muted">Her vises UI for aktive moduler (gratis + låst opp).</p>
       <div id="workHost"></div>
     </section>
 
-    <section class="panel hidden" data-view="farm">
-      <h1>Gård</h1>
+    <!-- MIN GÅRD (INNSTILLINGER) -->
+    <section class="panel hidden" data-view="settings">
+      <h1>Min gård</h1>
+      <p class="muted">Gårdsdata, status og kontroll. Kontrollpanelet er for handling.</p>
+
       <div class="card">
-        <h2>Grunninfo (gratis kjerne)</h2>
+        <h2>Gårdsinfo</h2>
 
         <label class="field">
           <span>Navn</span>
@@ -282,38 +258,85 @@
           </label>
         </div>
 
-        <div class="row">
-          <button class="btn" id="btnSaveFarm2">Lagre</button>
+        <div class="row" style="margin-top:10px">
+          <button class="btn" id="btnSaveFarmSettings">Lagre</button>
         </div>
+      </div>
 
-        <p class="hint">Detaljert areal, ressurser og logg ligger under “Arbeid”.</p>
+      <div class="card">
+        <h2>Nøkkeltall</h2>
+        <div class="grid2">
+          <div>
+            <div class="muted" style="font-size:12px">Sist lagret</div>
+            <div style="font-size:18px;font-weight:900" id="kpiUpdatedAt">—</div>
+          </div>
+          <div>
+            <div class="muted" style="font-size:12px">Areal total (daa)</div>
+            <div style="font-size:18px;font-weight:900" id="kpiTotalDaa">—</div>
+          </div>
+          <div>
+            <div class="muted" style="font-size:12px">Aktive moduler</div>
+            <div style="font-size:18px;font-weight:900" id="kpiEnabledModules">—</div>
+          </div>
+          <div>
+            <div class="muted" style="font-size:12px">Hendelser</div>
+            <div style="font-size:18px;font-weight:900" id="kpiEventCount">—</div>
+          </div>
+          <div>
+            <div class="muted" style="font-size:12px">TO DO (åpne)</div>
+            <div style="font-size:18px;font-weight:900" id="kpiTodoCount">—</div>
+          </div>
+          <div>
+            <div class="muted" style="font-size:12px">Handleliste (åpne)</div>
+            <div style="font-size:18px;font-weight:900" id="kpiShopCount">—</div>
+          </div>
+        </div>
+        <div class="hint">Hvis tall ser rare ut: ta backup og/eller kjør Selvtest.</div>
+      </div>
+
+      <div class="card">
+        <h2>Kontroll</h2>
+        <div class="row">
+          <button class="btn secondary" id="btnSaveNow2">Lagre nå</button>
+          <button class="btn danger" id="btnResetFarm">Nullstill gård</button>
+        </div>
+        <p class="hint">Ta backup før nullstilling.</p>
       </div>
     </section>
 
+    <!-- KONTROLLPANEL-OPPSETT -->
+    <section class="panel hidden" data-view="panelsetup">
+      <h1>Kontrollpanel</h1>
+      <p class="muted">Vis/skjul snarveier og flytt rekkefølge (⬆/⬇). De tre basis-knappene kan flyttes, men ikke skrus av.</p>
+      <div class="card">
+        <h2>Snarveier</h2>
+        <div id="panelSetupList"></div>
+        <div class="hint">Endringer lagres automatisk.</div>
+      </div>
+    </section>
+
+    <!-- BACKUP -->
     <section class="panel hidden" data-view="backup">
       <h1>Backup</h1>
-
       <div class="card">
         <h2>Eksporter</h2>
-        <p class="muted">Laster ned én JSON-fil med hele gården + modulstatus + lisenser.</p>
+        <p class="muted">Laster ned én JSON-fil med gården + modulstatus + kontrollpanel-oppsett.</p>
         <button class="btn" id="btnExport">Eksporter backup</button>
       </div>
 
       <div class="card">
         <h2>Importer</h2>
-        <p class="muted">Importer overskriver gjeldende gård i databasen.</p>
+        <p class="muted">Importer overskriver gjeldende gård i appen.</p>
         <input id="importFile" type="file" accept="application/json" />
         <button class="btn danger" id="btnImport">Importer backup</button>
       </div>
     </section>
 
+    <!-- TESTS -->
     <section class="panel hidden" data-view="tests">
       <h1>Selvtest</h1>
-
       <div class="card">
         <h2>Testpanel</h2>
-        <p class="muted">Kjør alle tester eller per modul.</p>
-
         <label class="field" style="margin-top:10px">
           <span>Velg modul</span>
           <select id="testModuleSelect"></select>
@@ -324,10 +347,11 @@
           <button class="btn secondary" id="btnRunTestsModule">Kjør valgte modul</button>
         </div>
 
-        <div id="testResults" class="results"></div>
+        <div id="testResults"></div>
       </div>
     </section>
 
+    <!-- MODULE STORE -->
     <section class="panel hidden" data-view="modules">
       <h1>Moduler</h1>
 
@@ -367,7 +391,7 @@
     </div>
   </div>
 
-  <!-- Generic editor modal -->
+  <!-- Editor modal -->
   <div class="overlay hidden" id="editorOverlay">
     <div class="overlayBg" id="editorOverlayBg"></div>
     <div class="modal">
@@ -388,13 +412,14 @@
       // =========================
       //  APP / DB BASICS
       // =========================
-      const APP_VERSION = "0.4.0";
+      const APP_VERSION = "0.8.0";
       const DB_NAME = "farmapp_db";
-      const DB_VERSION = 2;
+      const DB_VERSION = 4;
       const STORE = "documents";
       const FARM_KEY = "currentFarm";
       const LICENSE_KEY = "licenses";
       const MODULE_PREFS_KEY = "modulePrefs";
+      const PANEL_PREFS_KEY = "panelPrefs";
 
       const $ = (q) => document.querySelector(q);
       const $$ = (q) => [...document.querySelectorAll(q)];
@@ -403,11 +428,13 @@
         farmData: null,
         licenses: null,
         modulePrefs: null,
+        panelPrefs: null,      // { visible: {actionId: bool}, order: [actionId...] }
         licenseModalTarget: null,
         editor: { onSave: null, value: null, fields: [] }
       };
 
       function setStatus(text) { $("#statusLine").textContent = text; }
+      function nowIso(){ return new Date().toISOString(); }
 
       function fmtDate(iso) {
         if (!iso) return "—";
@@ -426,8 +453,34 @@
         }[c]));
       }
 
-      function nowIso(){ return new Date().toISOString(); }
+      // =========================
+      //  ICONS (inline SVG)
+      // =========================
+      const ICONS = {
+        event: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M7 3v4M17 3v4"/><path d="M4 7h16"/><path d="M6 11h5"/><path d="M6 15h9"/><path d="M6 19h7"/>
+          <rect x="4" y="5" width="16" height="16" rx="2"/>
+        </svg>`,
+        todo: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 11l2 2 4-4"/><path d="M7 6h14"/><path d="M7 12h14"/><path d="M7 18h14"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>
+        </svg>`,
+        shop: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 6h15l-2 8H7L6 6Z"/><path d="M6 6l-2-2H2"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/>
+        </svg>`,
+        clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/>
+        </svg>`,
+        weather: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M7 18a4 4 0 0 1 .4-8 5 5 0 0 1 9.7 1.3A3.5 3.5 0 1 1 17.5 18H7Z"/>
+        </svg>`,
+        module: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 7h7v7H4z"/><path d="M13 7h7v7h-7z"/><path d="M4 16h7v4H4z"/><path d="M13 16h7v4h-7z"/>
+        </svg>`
+      };
 
+      // =========================
+      //  DB
+      // =========================
       function openDB() {
         return new Promise((resolve, reject) => {
           const req = indexedDB.open(DB_NAME, DB_VERSION);
@@ -455,8 +508,7 @@
         const db = await openDB();
         return new Promise((resolve, reject) => {
           const tx = db.transaction(STORE, "readwrite");
-          const store = tx.objectStore(STORE);
-          store.put(value, key);
+          tx.objectStore(STORE).put(value, key);
           tx.oncomplete = () => { db.close(); resolve(); };
           tx.onerror = () => { db.close(); reject(tx.error); };
         });
@@ -473,7 +525,31 @@
       }
 
       // =========================
-      //  DATA MODEL (CORE)
+      //  MODULE REGISTRY
+      // =========================
+      const ModuleRegistry = (() => {
+        const modules = [];
+        function add(m){ modules.push(m); return m; }
+        function list(){ return modules.slice(); }
+        function get(id){ return modules.find(x => x.id === id) || null; }
+        return { add, list, get };
+      })();
+
+      // =========================
+      //  ACTION REGISTRY (future-friendly)
+      // =========================
+      // actionId => { title(), subtitle(), iconSvg(), isPinned, isToggleable, run() }
+      const ActionRegistry = (() => {
+        const actions = new Map();
+        function set(actionId, def){ actions.set(actionId, def); }
+        function get(actionId){ return actions.get(actionId) || null; }
+        function has(actionId){ return actions.has(actionId); }
+        function list(){ return [...actions.entries()].map(([id, def]) => ({ id, def })); }
+        return { set, get, has, list };
+      })();
+
+      // =========================
+      //  MODEL
       // =========================
       function createNewFarm() {
         const now = nowIso();
@@ -490,7 +566,6 @@
 
       function validateCore(data) {
         const errors = [];
-        if (!data || typeof data !== "object") errors.push("Data mangler.");
         if (!data?.meta) errors.push("meta mangler.");
         if (!data?.farm) errors.push("farm mangler.");
         if (!data?.farm?.id) errors.push("farm.id mangler.");
@@ -500,22 +575,11 @@
         if (!a) errors.push("farm.area mangler.");
         for (const k of ["dyrketDaa","beiteDaa","utmarkDaa"]) {
           const v = a?.[k];
-          if (typeof v !== "number" || Number.isNaN(v) || v < 0) errors.push(`farm.area.${k} må være et tall ≥ 0.`);
+          if (typeof v !== "number" || Number.isNaN(v) || v < 0) errors.push(`farm.area.${k} må være tall ≥ 0.`);
         }
         if (!data?.farm?.modules || typeof data.farm.modules !== "object") errors.push("farm.modules må finnes (objekt).");
         return { ok: errors.length === 0, errors };
       }
-
-      // =========================
-      //  MODULE REGISTRY
-      // =========================
-      const ModuleRegistry = (function(){
-        const modules = [];
-        function add(m){ modules.push(m); return m; }
-        function list(){ return modules.slice(); }
-        function get(id){ return modules.find(x => x.id === id) || null; }
-        return { add, list, get };
-      })();
 
       // =========================
       //  LICENSE + PREFS
@@ -534,6 +598,17 @@
         const out = {};
         for (const m of ModuleRegistry.list()) out[m.id] = { enabled: m.defaultEnabled === true };
         return out;
+      }
+
+      // Control panel prefs:
+      // - fixed pinned actions must always be visible (but can be moved)
+      // - order array defines display order
+      function defaultPanelPrefs() {
+        const pinned = getPinnedActionIds();
+        return {
+          visible: Object.fromEntries(pinned.map(id => [id, true])),
+          order: pinned.slice() // starts with pinned only
+        };
       }
 
       function licenseAllows(moduleId) {
@@ -562,13 +637,11 @@
       }
 
       async function setEnabled(moduleId, enabled) {
-        if (!state.modulePrefs) state.modulePrefs = defaultModulePrefs();
         state.modulePrefs[moduleId] = { enabled: !!enabled };
         await dbSet(MODULE_PREFS_KEY, state.modulePrefs);
         ensureDataPatched();
         await saveFarm();
         renderModules();
-        renderTestModuleSelect();
         renderWork();
         renderKPIs();
       }
@@ -585,727 +658,7 @@
       }
 
       // =========================
-      //  MODULES
-      // =========================
-
-      // FREE: farm core
-      ModuleRegistry.add({
-        id: "farm.core",
-        title: "Kjerne: Gård",
-        description: "Grunnmodell, lagring og basisfelt (navn/areal).",
-        priceModel: "free",
-        defaultEnabled: true,
-        dependsOn: [],
-        order: 10,
-        dataPatch: (d) => {
-          if (!d.farm.modules.core) d.farm.modules.core = { notes: "" };
-        },
-        validate: (d) => validateCore(d),
-        calc: (d) => ({ ok: true }),
-        ui: null,
-        tests: [
-          { name: "farm.core: Ny gård validerer", run: () => {
-            const d = createNewFarm();
-            const v = validateCore(d);
-            if (!v.ok) throw new Error(v.errors.join(" | "));
-          }},
-          { name: "farm.core: Negativt areal feiler", run: () => {
-            const d = createNewFarm();
-            d.farm.area.utmarkDaa = -1;
-            const v = validateCore(d);
-            if (v.ok) throw new Error("Skulle feile ved negativ utmark");
-          }}
-        ]
-      });
-
-      // FREE: area core
-      ModuleRegistry.add({
-        id: "area.core",
-        title: "Kjerne: Areal",
-        description: "Grunnareal som kapasitet. Detaljer kommer i arealenheter/skifter.",
-        priceModel: "free",
-        defaultEnabled: true,
-        dependsOn: ["farm.core"],
-        order: 20,
-        dataPatch: (d) => { if (!d.farm.modules.area) d.farm.modules.area = {}; },
-        validate: () => ({ ok:true, errors:[] }),
-        calc: (d) => {
-          const a = d.farm.area;
-          return { totalDaa: (a.dyrketDaa||0) + (a.beiteDaa||0) + (a.utmarkDaa||0) };
-        },
-        ui: null,
-        tests: [
-          { name: "area.core: totalDaa", run: () => {
-            const d = createNewFarm();
-            d.farm.area = { dyrketDaa: 10, beiteDaa: 2, utmarkDaa: 3 };
-            const r = ModuleRegistry.get("area.core").calc(d);
-            if (r.totalDaa !== 15) throw new Error("Forventet 15");
-          }}
-        ]
-      });
-
-      // FREE: resources core (UPGRADED with UI)
-      ModuleRegistry.add({
-        id: "resources.core",
-        title: "Kjerne: Ressurser",
-        description: "Arbeidstimer, maskiner og bygg (enkelt register).",
-        priceModel: "free",
-        defaultEnabled: false,
-        dependsOn: ["farm.core"],
-        order: 30,
-        dataPatch: (d) => {
-          if (!d.farm.modules.resources) d.farm.modules.resources = {
-            labor:{hoursPerWeek:0},
-            machines: [],
-            buildings: []
-          };
-        },
-        validate: (d) => {
-          const errors = [];
-          const r = d?.farm?.modules?.resources;
-          if (!r) return { ok:false, errors:["resources mangler."] };
-          if (typeof r.labor?.hoursPerWeek !== "number" || r.labor.hoursPerWeek < 0) errors.push("Labor hoursPerWeek må være ≥ 0.");
-          if (!Array.isArray(r.machines)) errors.push("machines må være liste.");
-          if (!Array.isArray(r.buildings)) errors.push("buildings må være liste.");
-          return { ok: errors.length === 0, errors };
-        },
-        calc: (d) => {
-          const r = d.farm.modules.resources;
-          return {
-            hoursPerWeek: r?.labor?.hoursPerWeek ?? 0,
-            machines: (r?.machines || []).length,
-            buildings: (r?.buildings || []).length
-          };
-        },
-        ui: {
-          render: (host, d, results, api) => {
-            const r = d.farm.modules.resources;
-
-            const card = document.createElement("div");
-            card.className = "card";
-            card.innerHTML = `
-              <h2>Ressurser</h2>
-              <p class="muted">Registrer kapasitet og ressurser. Senere bruker optimalisering dette som begrensning.</p>
-              <div class="grid3" style="margin-top:10px">
-                <label class="field">
-                  <span>Arbeidstimer per uke</span>
-                  <input id="resHours" type="number" min="0" step="0.5" />
-                </label>
-                <div class="kpi">
-                  <div class="kpiLabel">Maskiner</div>
-                  <div class="kpiValue">${results?.machines ?? 0}</div>
-                </div>
-                <div class="kpi">
-                  <div class="kpiLabel">Bygg</div>
-                  <div class="kpiValue">${results?.buildings ?? 0}</div>
-                </div>
-              </div>
-              <div class="row" style="margin-top:10px">
-                <button class="btn secondary" id="btnSaveRes">Lagre ressurser</button>
-              </div>
-            `;
-
-            // Set + save hours
-            const inp = card.querySelector("#resHours");
-            inp.value = String(r.labor.hoursPerWeek ?? 0);
-            card.querySelector("#btnSaveRes").addEventListener("click", async () => {
-              r.labor.hoursPerWeek = Number(inp.value);
-              await api.saveAndRefresh();
-            });
-
-            // Machines
-            const machineCard = document.createElement("div");
-            machineCard.className = "card";
-            machineCard.innerHTML = `
-              <h2>Maskiner</h2>
-              <div id="machineRows"></div>
-              <div class="row" style="margin-top:10px">
-                <button class="btn" id="btnAddMachine">Legg til maskin</button>
-                <button class="btn danger" id="btnClearMachines">Slett alle</button>
-              </div>
-            `;
-            const mHost = machineCard.querySelector("#machineRows");
-            for (let i=0;i<r.machines.length;i++){
-              const m = r.machines[i];
-              const row = document.createElement("div");
-              row.className = "moduleRow";
-              row.innerHTML = `
-                <div class="moduleMeta">
-                  <div class="moduleTitle">${escapeHtml(m.name || "Maskin")}</div>
-                  <div class="small">${escapeHtml(m.type || "type?")} · ${escapeHtml(m.note || "")}</div>
-                </div>
-                <div class="moduleRight">
-                  <div class="moduleActions">
-                    <button class="btn secondary" data-act="edit">Rediger</button>
-                    <button class="btn danger" data-act="del">Slett</button>
-                  </div>
-                </div>
-              `;
-              row.querySelector('[data-act="del"]').addEventListener("click", async () => {
-                if (!confirm("Slette maskinen?")) return;
-                r.machines.splice(i,1);
-                await api.saveAndRefresh();
-              });
-              row.querySelector('[data-act="edit"]').addEventListener("click", () => {
-                api.openEditor({
-                  title: "Rediger maskin",
-                  subtitle: "Enkelt register. Service/vedlikehold kommer senere.",
-                  fields: [
-                    { key:"name", label:"Navn", type:"text" },
-                    { key:"type", label:"Type", type:"text" },
-                    { key:"note", label:"Merknad", type:"text" }
-                  ],
-                  value: m,
-                  onSave: async (nv) => {
-                    r.machines[i] = { ...m, ...nv };
-                    await api.saveAndRefresh();
-                  }
-                });
-              });
-              mHost.appendChild(row);
-            }
-            machineCard.querySelector("#btnAddMachine").addEventListener("click", async () => {
-              r.machines.push({
-                id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()),
-                name: `Maskin ${r.machines.length+1}`,
-                type: "Traktor / Redskap / Annet",
-                note: ""
-              });
-              await api.saveAndRefresh();
-            });
-            machineCard.querySelector("#btnClearMachines").addEventListener("click", async () => {
-              if (!confirm("Slette alle maskiner?")) return;
-              r.machines = [];
-              await api.saveAndRefresh();
-            });
-
-            // Buildings
-            const bCard = document.createElement("div");
-            bCard.className = "card";
-            bCard.innerHTML = `
-              <h2>Bygg</h2>
-              <div id="buildingRows"></div>
-              <div class="row" style="margin-top:10px">
-                <button class="btn" id="btnAddBuilding">Legg til bygg</button>
-                <button class="btn danger" id="btnClearBuildings">Slett alle</button>
-              </div>
-            `;
-            const bHost = bCard.querySelector("#buildingRows");
-            for (let i=0;i<r.buildings.length;i++){
-              const b = r.buildings[i];
-              const row = document.createElement("div");
-              row.className = "moduleRow";
-              row.innerHTML = `
-                <div class="moduleMeta">
-                  <div class="moduleTitle">${escapeHtml(b.name || "Bygg")}</div>
-                  <div class="small">${escapeHtml(b.type || "type?")} · ${escapeHtml(b.note || "")}</div>
-                </div>
-                <div class="moduleRight">
-                  <div class="moduleActions">
-                    <button class="btn secondary" data-act="edit">Rediger</button>
-                    <button class="btn danger" data-act="del">Slett</button>
-                  </div>
-                </div>
-              `;
-              row.querySelector('[data-act="del"]').addEventListener("click", async () => {
-                if (!confirm("Slette bygget?")) return;
-                r.buildings.splice(i,1);
-                await api.saveAndRefresh();
-              });
-              row.querySelector('[data-act="edit"]').addEventListener("click", () => {
-                api.openEditor({
-                  title: "Rediger bygg",
-                  subtitle: "Enkelt register. Kapasitet/energibruk kan legges på senere.",
-                  fields: [
-                    { key:"name", label:"Navn", type:"text" },
-                    { key:"type", label:"Type", type:"text" },
-                    { key:"note", label:"Merknad", type:"text" }
-                  ],
-                  value: b,
-                  onSave: async (nv) => {
-                    r.buildings[i] = { ...b, ...nv };
-                    await api.saveAndRefresh();
-                  }
-                });
-              });
-              bHost.appendChild(row);
-            }
-            bCard.querySelector("#btnAddBuilding").addEventListener("click", async () => {
-              r.buildings.push({
-                id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()),
-                name: `Bygg ${r.buildings.length+1}`,
-                type: "Fjøs / Lager / Annet",
-                note: ""
-              });
-              await api.saveAndRefresh();
-            });
-            bCard.querySelector("#btnClearBuildings").addEventListener("click", async () => {
-              if (!confirm("Slette alle bygg?")) return;
-              r.buildings = [];
-              await api.saveAndRefresh();
-            });
-
-            host.appendChild(card);
-            host.appendChild(machineCard);
-            host.appendChild(bCard);
-          }
-        },
-        tests: [
-          { name: "resources.core: dataPatch", run: () => {
-            const d = createNewFarm();
-            ModuleRegistry.get("resources.core").dataPatch(d);
-            if (!d.farm.modules.resources?.labor) throw new Error("Mangler labor");
-          }},
-          { name: "resources.core: validate hours >= 0", run: () => {
-            const d = createNewFarm();
-            ModuleRegistry.get("resources.core").dataPatch(d);
-            d.farm.modules.resources.labor.hoursPerWeek = -1;
-            const v = ModuleRegistry.get("resources.core").validate(d);
-            if (v.ok) throw new Error("Skulle feile ved negative timer");
-          }}
-        ]
-      });
-
-      // FREE: log module (universal)
-      ModuleRegistry.add({
-        id: "log.core",
-        title: "Logg: Hendelser",
-        description: "Universell hendelseslogg for drift, vedlikehold, avvik, notater osv.",
-        priceModel: "free",
-        defaultEnabled: false,
-        dependsOn: ["farm.core"],
-        order: 40,
-        dataPatch: (d) => {
-          if (!d.farm.modules.log) d.farm.modules.log = { entries: [] };
-        },
-        validate: (d) => {
-          const errors = [];
-          const log = d?.farm?.modules?.log;
-          if (!log || !Array.isArray(log.entries)) return { ok:false, errors:["log.entries må finnes (liste)."] };
-          for (let i=0;i<log.entries.length;i++){
-            const e = log.entries[i];
-            if (!e?.id) errors.push(`Entry ${i+1}: id mangler.`);
-            if (!e?.date) errors.push(`Entry ${i+1}: dato mangler.`);
-            if (typeof e?.category !== "string") errors.push(`Entry ${i+1}: kategori må være tekst.`);
-            if (typeof e?.text !== "string" || !e.text.trim()) errors.push(`Entry ${i+1}: tekst mangler.`);
-          }
-          return { ok: errors.length===0, errors };
-        },
-        calc: (d) => {
-          const n = d.farm.modules.log?.entries?.length ?? 0;
-          return { count: n };
-        },
-        ui: {
-          render: (host, d, results, api) => {
-            const log = d.farm.modules.log;
-            const card = document.createElement("div");
-            card.className = "card";
-            card.innerHTML = `
-              <h2>Hendelseslogg</h2>
-              <p class="muted">Legg inn hva som er gjort, når og hvorfor. Dette kan brukes til rapporter senere.</p>
-              <div class="grid2" style="margin-top:10px">
-                <div class="kpi"><div class="kpiLabel">Antall poster</div><div class="kpiValue">${results?.count ?? 0}</div></div>
-                <div class="note">Tips: Bruk kategorier som “Vedlikehold”, “Sprøyting”, “Slått”, “Avvik”, “Notat”.</div>
-              </div>
-            `;
-
-            const list = document.createElement("div");
-            list.className = "card";
-            list.innerHTML = `<h2>Poster</h2><div id="logRows"></div>`;
-            const rowsHost = list.querySelector("#logRows");
-
-            const btnRow = document.createElement("div");
-            btnRow.className = "row";
-            btnRow.style.marginTop = "10px";
-
-            const btnAdd = document.createElement("button");
-            btnAdd.className = "btn";
-            btnAdd.textContent = "Ny loggpost";
-            btnAdd.addEventListener("click", async () => {
-              log.entries.unshift({
-                id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()),
-                date: nowIso().slice(0,10),
-                category: "Notat",
-                text: ""
-              });
-              // open editor right away
-              api.openEditor({
-                title: "Ny loggpost",
-                subtitle: "Skriv kort og konkret.",
-                fields: [
-                  { key:"date", label:"Dato (YYYY-MM-DD)", type:"text" },
-                  { key:"category", label:"Kategori", type:"text" },
-                  { key:"text", label:"Tekst", type:"text" }
-                ],
-                value: log.entries[0],
-                onSave: async (nv) => {
-                  log.entries[0] = { ...log.entries[0], ...nv };
-                  await api.saveAndRefresh();
-                }
-              });
-              await api.saveAndRefresh();
-            });
-
-            const btnClear = document.createElement("button");
-            btnClear.className = "btn danger";
-            btnClear.textContent = "Slett alle";
-            btnClear.addEventListener("click", async () => {
-              if (!confirm("Slette alle loggposter?")) return;
-              log.entries = [];
-              await api.saveAndRefresh();
-            });
-
-            btnRow.appendChild(btnAdd);
-            btnRow.appendChild(btnClear);
-            list.appendChild(btnRow);
-
-            for (let i=0;i<log.entries.length;i++){
-              const e = log.entries[i];
-              const row = document.createElement("div");
-              row.className = "moduleRow";
-              row.innerHTML = `
-                <div class="moduleMeta">
-                  <div class="moduleTitle">${escapeHtml(e.category || "Logg")}</div>
-                  <div class="small">${escapeHtml(e.date || "")}</div>
-                  <div class="moduleDesc">${escapeHtml((e.text||"").slice(0,120))}${(e.text||"").length>120?"…":""}</div>
-                </div>
-                <div class="moduleRight">
-                  <div class="moduleActions">
-                    <button class="btn secondary" data-act="edit">Rediger</button>
-                    <button class="btn danger" data-act="del">Slett</button>
-                  </div>
-                </div>
-              `;
-              row.querySelector('[data-act="del"]').addEventListener("click", async () => {
-                if (!confirm("Slette denne posten?")) return;
-                log.entries.splice(i,1);
-                await api.saveAndRefresh();
-              });
-              row.querySelector('[data-act="edit"]').addEventListener("click", () => {
-                api.openEditor({
-                  title: "Rediger loggpost",
-                  subtitle: "Dato, kategori og tekst.",
-                  fields: [
-                    { key:"date", label:"Dato (YYYY-MM-DD)", type:"text" },
-                    { key:"category", label:"Kategori", type:"text" },
-                    { key:"text", label:"Tekst", type:"text" }
-                  ],
-                  value: e,
-                  onSave: async (nv) => {
-                    log.entries[i] = { ...e, ...nv };
-                    await api.saveAndRefresh();
-                  }
-                });
-              });
-              rowsHost.appendChild(row);
-            }
-
-            host.appendChild(card);
-            host.appendChild(list);
-          }
-        },
-        tests: [
-          { name: "log.core: dataPatch lager entries[]", run: () => {
-            const d = createNewFarm();
-            ModuleRegistry.get("log.core").dataPatch(d);
-            if (!Array.isArray(d.farm.modules.log.entries)) throw new Error("Mangler log.entries[]");
-          }},
-          { name: "log.core: validate feiler uten tekst", run: () => {
-            const d = createNewFarm();
-            ModuleRegistry.get("log.core").dataPatch(d);
-            d.farm.modules.log.entries = [{ id:"1", date:"2026-01-01", category:"Notat", text:"" }];
-            const v = ModuleRegistry.get("log.core").validate(d);
-            if (v.ok) throw new Error("Skulle feile uten tekst");
-          }}
-        ]
-      });
-
-      // PAID: area units (skifter)
-      ModuleRegistry.add({
-        id: "area.units",
-        title: "Areal: Arealenheter / skifter",
-        description: "Detaljert arealstyring: skifter, beiteområder, utmark, veksthus osv. Summering og kontroll.",
-        priceModel: "paid",
-        defaultEnabled: false,
-        dependsOn: ["farm.core","area.core"],
-        order: 50,
-        dataPatch: (d) => {
-          if (!d.farm.modules.areaUnits) d.farm.modules.areaUnits = { units: [] };
-        },
-        validate: (d) => {
-          const errors = [];
-          const mod = d?.farm?.modules?.areaUnits;
-          if (!mod || !Array.isArray(mod.units)) return { ok:false, errors:["farm.modules.areaUnits.units må finnes (liste)."] };
-
-          const allowedTypes = ["dyrket","innmarksbeite","utmark","veksthus","fruktbær","annet"];
-          const allowedUse = ["slått","beite","kombinert","brakklagt","annet"];
-          const allowedQuality = ["svært_god","god","middels","svak","ukjent"];
-
-          for (let i=0;i<mod.units.length;i++){
-            const u = mod.units[i];
-            if (!u?.id) errors.push(`Enhet ${i+1}: id mangler.`);
-            if (typeof u?.name !== "string" || !u.name.trim()) errors.push(`Enhet ${i+1}: navn mangler.`);
-            if (!allowedTypes.includes(u.type)) errors.push(`Enhet ${i+1}: ugyldig type.`);
-            if (typeof u.areaDaa !== "number" || Number.isNaN(u.areaDaa) || u.areaDaa <= 0) errors.push(`Enhet ${i+1}: areal (daa) må være > 0.`);
-            if (!allowedQuality.includes(u.quality)) errors.push(`Enhet ${i+1}: ugyldig kvalitet.`);
-            if (!allowedUse.includes(u.use)) errors.push(`Enhet ${i+1}: ugyldig bruk.`);
-          }
-          return { ok: errors.length === 0, errors };
-        },
-        calc: (d) => {
-          const mod = d.farm.modules.areaUnits;
-          const sums = { dyrket:0, innmarksbeite:0, utmark:0, veksthus:0, fruktbær:0, annet:0, total:0 };
-
-          for (const u of (mod?.units || [])) {
-            const a = (u && typeof u.areaDaa === "number") ? u.areaDaa : 0;
-            sums.total += a;
-            if (u?.type && sums[u.type] != null) sums[u.type] += a;
-            else sums.annet += a;
-          }
-
-          const base = d.farm.area || { dyrketDaa:0, beiteDaa:0, utmarkDaa:0 };
-          const deltas = {
-            dyrket: sums.dyrket - (base.dyrketDaa||0),
-            innmarksbeite: sums.innmarksbeite - (base.beiteDaa||0),
-            utmark: sums.utmark - (base.utmarkDaa||0)
-          };
-          return { sums, deltas };
-        },
-        ui: {
-          render: (host, d, results, api) => {
-            const mod = d.farm.modules.areaUnits;
-
-            const header = document.createElement("div");
-            header.className = "card";
-            header.innerHTML = `
-              <h2>Arealenheter / skifter</h2>
-              <p class="muted">Legg inn skifter/beiteområder med type, areal, kvalitet og bruk. Appen summerer og sjekker mot grunnareal.</p>
-            `;
-
-            const sums = results?.sums || {};
-            const deltas = results?.deltas || {};
-            const kpi = document.createElement("div");
-            kpi.className = "card";
-            kpi.innerHTML = `
-              <h2>Oppsummering</h2>
-              <div class="grid2">
-                <div class="kpi"><div class="kpiLabel">Sum enheter (daa)</div><div class="kpiValue">${(sums.total||0).toFixed(1)}</div></div>
-                <div class="kpi"><div class="kpiLabel">Dyrket (daa)</div><div class="kpiValue">${(sums.dyrket||0).toFixed(1)}</div></div>
-                <div class="kpi"><div class="kpiLabel">Innmarksbeite (daa)</div><div class="kpiValue">${(sums.innmarksbeite||0).toFixed(1)}</div></div>
-                <div class="kpi"><div class="kpiLabel">Utmark (daa)</div><div class="kpiValue">${(sums.utmark||0).toFixed(1)}</div></div>
-              </div>
-              <div class="small" style="margin-top:10px">
-                Avvik mot grunnareal: Dyrket ${fmtDelta(deltas.dyrket)} / Innmarksbeite ${fmtDelta(deltas.innmarksbeite)} / Utmark ${fmtDelta(deltas.utmark)}
-              </div>
-            `;
-
-            const list = document.createElement("div");
-            list.className = "card";
-            list.innerHTML = `<h2>Enheter</h2><div id="areaUnitsRows"></div>`;
-            const rowsHost = list.querySelector("#areaUnitsRows");
-
-            const btnRow = document.createElement("div");
-            btnRow.className = "row";
-            btnRow.style.marginTop = "10px";
-
-            const btnAdd = document.createElement("button");
-            btnAdd.className = "btn";
-            btnAdd.textContent = "Legg til enhet";
-            btnAdd.addEventListener("click", async () => {
-              mod.units.push({
-                id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()),
-                name: `Enhet ${mod.units.length + 1}`,
-                type: "dyrket",
-                areaDaa: 1,
-                quality: "ukjent",
-                use: "annet",
-                note: ""
-              });
-              await api.saveAndRefresh();
-            });
-
-            const btnClear = document.createElement("button");
-            btnClear.className = "btn danger";
-            btnClear.textContent = "Slett alle";
-            btnClear.addEventListener("click", async () => {
-              if (!confirm("Slette alle arealenheter?")) return;
-              mod.units = [];
-              await api.saveAndRefresh();
-            });
-
-            btnRow.appendChild(btnAdd);
-            btnRow.appendChild(btnClear);
-            list.appendChild(btnRow);
-
-            for (let i=0;i<mod.units.length;i++){
-              const u = mod.units[i];
-              const row = document.createElement("div");
-              row.className = "moduleRow";
-              row.innerHTML = `
-                <div class="moduleMeta">
-                  <div class="moduleTitle">${escapeHtml(u.name || `Enhet ${i+1}`)}</div>
-                  <div class="moduleDesc">Type: ${escapeHtml(u.type)} · ${Number(u.areaDaa||0).toFixed(1)} daa</div>
-                  <div class="small">Kvalitet: ${escapeHtml(u.quality)} · Bruk: ${escapeHtml(u.use)}</div>
-                </div>
-                <div class="moduleRight">
-                  <div class="moduleActions">
-                    <button class="btn secondary" data-act="edit">Rediger</button>
-                    <button class="btn danger" data-act="del">Slett</button>
-                  </div>
-                </div>
-              `;
-
-              row.querySelector('[data-act="del"]').addEventListener("click", async () => {
-                if (!confirm("Slette denne enheten?")) return;
-                mod.units.splice(i, 1);
-                await api.saveAndRefresh();
-              });
-
-              row.querySelector('[data-act="edit"]').addEventListener("click", () => {
-                api.openEditor({
-                  title: "Rediger arealenhet",
-                  subtitle: "Endringer lagres lokalt på telefonen.",
-                  fields: [
-                    { key:"name", label:"Navn", type:"text" },
-                    { key:"type", label:"Type", type:"select", options:[
-                      ["dyrket","Dyrket"],["innmarksbeite","Innmarksbeite"],["utmark","Utmark"],["veksthus","Veksthus"],["fruktbær","Frukt/bær"],["annet","Annet"]
-                    ]},
-                    { key:"areaDaa", label:"Areal (daa)", type:"number" },
-                    { key:"quality", label:"Kvalitet", type:"select", options:[
-                      ["svært_god","Svært god"],["god","God"],["middels","Middels"],["svak","Svak"],["ukjent","Ukjent"]
-                    ]},
-                    { key:"use", label:"Bruk", type:"select", options:[
-                      ["slått","Slått"],["beite","Beite"],["kombinert","Kombinert"],["brakklagt","Brakklagt"],["annet","Annet"]
-                    ]},
-                    { key:"note", label:"Merknad", type:"text" }
-                  ],
-                  value: u,
-                  onSave: async (newVal) => {
-                    newVal.areaDaa = Number(newVal.areaDaa);
-                    mod.units[i] = newVal;
-                    await api.saveAndRefresh();
-                  }
-                });
-              });
-
-              rowsHost.appendChild(row);
-            }
-
-            host.appendChild(header);
-            host.appendChild(kpi);
-            host.appendChild(list);
-
-            function fmtDelta(x){
-              const n = Number(x||0);
-              const s = (n>=0?"+":"") + n.toFixed(1);
-              return `<span>${s}</span>`;
-            }
-          }
-        },
-        tests: [
-          { name: "area.units: dataPatch lager struktur", run: () => {
-            const d = createNewFarm();
-            ModuleRegistry.get("area.units").dataPatch(d);
-            if (!d.farm.modules.areaUnits || !Array.isArray(d.farm.modules.areaUnits.units)) throw new Error("Mangler units[]");
-          }},
-          { name: "area.units: summering total", run: () => {
-            const d = createNewFarm();
-            ModuleRegistry.get("area.units").dataPatch(d);
-            d.farm.modules.areaUnits.units = [
-              {id:"1",name:"A",type:"dyrket",areaDaa:10,quality:"ukjent",use:"annet",note:""},
-              {id:"2",name:"B",type:"utmark",areaDaa:5,quality:"ukjent",use:"annet",note:""}
-            ];
-            const r = ModuleRegistry.get("area.units").calc(d);
-            if (r.sums.total !== 15) throw new Error("Forventet total 15");
-          }}
-        ]
-      });
-
-      // PAID: productions profiles (universal)
-      ModuleRegistry.add({
-        id: "productions.core",
-        title: "Produksjonsprofiler",
-        description: "Aktiver hva gården driver med (korn, melk, grønt, frukt/bær, svin, fjørfe, foredling osv.).",
-        priceModel: "paid",
-        defaultEnabled: false,
-        dependsOn: ["farm.core"],
-        order: 60,
-        dataPatch: (d) => {
-          if (!d.farm.modules.productions) d.farm.modules.productions = { active: [], settings: {} };
-        },
-        validate: (d) => {
-          const p = d?.farm?.modules?.productions;
-          if (!p || !Array.isArray(p.active)) return { ok:false, errors:["productions.active må være liste."] };
-          return { ok:true, errors:[] };
-        },
-        calc: (d) => ({ active: d.farm.modules.productions?.active || [] }),
-        ui: {
-          render: (host, d, results, api) => {
-            const p = d.farm.modules.productions;
-            const catalog = [
-              { id:"korn", name:"Korn" },
-              { id:"grovfor", name:"Grovfôr" },
-              { id:"melk", name:"Melk" },
-              { id:"kjott", name:"Kjøtt" },
-              { id:"gronnsaker", name:"Grønnsaker" },
-              { id:"fruktbaer", name:"Frukt/bær" },
-              { id:"svin", name:"Svin" },
-              { id:"fjorfe", name:"Fjørfe" },
-              { id:"foredling", name:"Foredling" }
-            ];
-
-            const card = document.createElement("div");
-            card.className = "card";
-            card.innerHTML = `
-              <h2>Produksjonsprofiler</h2>
-              <p class="muted">Velg hvilke produksjoner som er relevante. Dette styrer hva appen viser senere.</p>
-              <div class="small">Aktive: <b>${(results?.active || []).length}</b></div>
-            `;
-
-            const list = document.createElement("div");
-            list.className = "card";
-            list.innerHTML = `<h2>Velg produksjoner</h2><div id="prodRows"></div>`;
-            const rows = list.querySelector("#prodRows");
-
-            for (const item of catalog) {
-              const on = (p.active || []).includes(item.id);
-              const row = document.createElement("div");
-              row.className = "moduleRow";
-              row.innerHTML = `
-                <div class="moduleMeta">
-                  <div class="moduleTitle">${escapeHtml(item.name)}</div>
-                  <div class="small">${escapeHtml(item.id)}</div>
-                </div>
-                <div class="moduleRight">
-                  <div class="moduleActions">
-                    <button class="btn ${on ? "secondary" : ""}" data-act="toggle">${on ? "Deaktiver" : "Aktiver"}</button>
-                  </div>
-                </div>
-              `;
-              row.querySelector('[data-act="toggle"]').addEventListener("click", async () => {
-                const idx = p.active.indexOf(item.id);
-                if (idx >= 0) p.active.splice(idx,1);
-                else p.active.push(item.id);
-                await api.saveAndRefresh();
-              });
-              rows.appendChild(row);
-            }
-
-            host.appendChild(card);
-            host.appendChild(list);
-          }
-        },
-        tests: [
-          { name: "productions.core: dataPatch", run: () => {
-            const d = createNewFarm();
-            ModuleRegistry.get("productions.core").dataPatch(d);
-            if (!Array.isArray(d.farm.modules.productions.active)) throw new Error("Mangler active[]");
-          }}
-        ]
-      });
-
-      // =========================
-      //  ROUTING / UI HELPERS
+      //  ROUTING + MODALS
       // =========================
       function routeTo(route) {
         $$("#tabs .tab").forEach(b => b.classList.toggle("active", b.dataset.route === route));
@@ -1317,7 +670,7 @@
         const m = ModuleRegistry.get(moduleId);
         const label = licenseLabel(moduleId);
         $("#licenseModalText").innerHTML = `
-          <div><b>${escapeHtml(m.title)}</b></div>
+          <div><b>${escapeHtml(m?.title || moduleId)}</b></div>
           <div class="small">Status: <span class="badge ${label.cls}">${escapeHtml(label.text)}</span></div>
         `;
         $("#licenseCodeInput").value = "";
@@ -1355,13 +708,16 @@
               input.appendChild(opt);
             }
             input.value = state.editor.value[f.key] ?? (f.options?.[0]?.[0] ?? "");
+          } else if (f.type === "textarea") {
+            input = document.createElement("textarea");
+            input.value = (state.editor.value[f.key] ?? "");
           } else {
             input = document.createElement("input");
             input.type = f.type === "number" ? "number" : "text";
             input.value = (state.editor.value[f.key] ?? "");
           }
 
-          input.addEventListener("change", () => {
+          input.addEventListener("input", () => {
             state.editor.value[f.key] = (f.type === "number") ? Number(input.value) : input.value;
           });
 
@@ -1379,7 +735,7 @@
       }
 
       // =========================
-      //  DATA PATCHING & VALIDATION
+      //  PATCHING
       // =========================
       function ensureDataPatched() {
         const d = state.farmData;
@@ -1392,20 +748,19 @@
       }
 
       // =========================
-      //  SAVE / RESET / BACKUP
+      //  SAVE / BACKUP
       // =========================
       function syncFarmToForm() {
         const d = state.farmData;
-        if (!d) return;
         $("#farmName").value = d.farm.name ?? "";
         $("#areaDyrket").value = d.farm.area.dyrketDaa ?? 0;
         $("#areaBeite").value = d.farm.area.beiteDaa ?? 0;
         $("#areaUtmark").value = d.farm.area.utmarkDaa ?? 0;
+        $("#topTitle").textContent = d.farm.name ? d.farm.name : "Gårdsapp";
       }
 
       function syncFormToFarm() {
         const d = state.farmData;
-        if (!d) return;
         d.farm.name = ($("#farmName").value || "").trim() || "Min gård";
         d.farm.area.dyrketDaa = num($("#areaDyrket").value);
         d.farm.area.beiteDaa  = num($("#areaBeite").value);
@@ -1415,23 +770,22 @@
 
       function renderKPIs() {
         const d = state.farmData;
-        if (!d) return;
-
         const areaTotal = (d.farm.area.dyrketDaa||0) + (d.farm.area.beiteDaa||0) + (d.farm.area.utmarkDaa||0);
         const enabledCount = Object.values(state.modulePrefs || {}).filter(x => x?.enabled).length;
-        const logCount = d.farm.modules.log?.entries?.length ?? 0;
-        const prodCount = d.farm.modules.productions?.active?.length ?? 0;
 
-        $("#kpiFarmName").textContent = d.farm.name ?? "—";
+        const eventCount = d.farm.modules.events?.entries?.length ?? 0;
+        const todoCount = d.farm.modules.todo?.items?.filter(x=>!x.done).length ?? 0;
+        const shopCount = d.farm.modules.shopping?.items?.filter(x=>!x.bought).length ?? 0;
+
         $("#kpiUpdatedAt").textContent = fmtDate(d.meta.updatedAt);
         $("#kpiTotalDaa").textContent = String(areaTotal);
         $("#kpiEnabledModules").textContent = String(enabledCount);
-        $("#kpiLogCount").textContent = String(logCount);
-        $("#kpiProdCount").textContent = String(prodCount);
+        $("#kpiEventCount").textContent = String(eventCount);
+        $("#kpiTodoCount").textContent = String(todoCount);
+        $("#kpiShopCount").textContent = String(shopCount);
       }
 
       async function saveFarm() {
-        if (!state.farmData) return;
         syncFormToFarm();
         ensureDataPatched();
 
@@ -1447,32 +801,8 @@
         if (errors.length) { alert("Kan ikke lagre:\n\n" + errors.join("\n")); return; }
 
         await dbSet(FARM_KEY, state.farmData);
+        $("#topTitle").textContent = state.farmData.farm.name;
         setStatus("Lagret ✅");
-        renderKPIs();
-      }
-
-      async function resetFarm() {
-        await dbClearAll();
-        state.farmData = createNewFarm();
-        state.licenses = defaultLicenses();
-        state.modulePrefs = defaultModulePrefs();
-
-        // Always enable core
-        state.modulePrefs["farm.core"] = { enabled: true };
-        state.modulePrefs["area.core"] = { enabled: true };
-
-        ensureDataPatched();
-
-        await dbSet(FARM_KEY, state.farmData);
-        await dbSet(LICENSE_KEY, state.licenses);
-        await dbSet(MODULE_PREFS_KEY, state.modulePrefs);
-
-        syncFarmToForm();
-        renderModules();
-        renderTestModuleSelect();
-        renderWork();
-        renderKPIs();
-        setStatus("Ny gård opprettet ✅");
       }
 
       function downloadJSON(filename, obj) {
@@ -1488,13 +818,13 @@
       }
 
       async function exportBackup() {
-        if (!state.farmData) return;
         const payload = {
           exportedAt: nowIso(),
           appVersion: APP_VERSION,
           farm: state.farmData,
           licenses: state.licenses,
-          modulePrefs: state.modulePrefs
+          modulePrefs: state.modulePrefs,
+          panelPrefs: state.panelPrefs
         };
         const safeName = (state.farmData.farm.name || "farm").toLowerCase().replace(/[^a-z0-9]+/g, "-");
         downloadJSON(`${safeName}-backup.json`, payload);
@@ -1512,6 +842,7 @@
         const farm = parsed?.farm ?? parsed?.data ?? parsed;
         const licenses = parsed?.licenses ?? null;
         const modulePrefs = parsed?.modulePrefs ?? null;
+        const panelPrefs = parsed?.panelPrefs ?? null;
 
         const v = validateCore(farm);
         if (!v.ok) { alert("Import stoppet:\n\n" + v.errors.join("\n")); return; }
@@ -1520,33 +851,1289 @@
         state.farmData.meta.updatedAt = nowIso();
         state.licenses = (licenses && typeof licenses === "object") ? licenses : defaultLicenses();
         state.modulePrefs = (modulePrefs && typeof modulePrefs === "object") ? modulePrefs : defaultModulePrefs();
+        state.panelPrefs = normalizePanelPrefs((panelPrefs && typeof panelPrefs === "object") ? panelPrefs : defaultPanelPrefs());
 
+        // Always enable core
         state.modulePrefs["farm.core"] = { enabled: true };
         state.modulePrefs["area.core"] = { enabled: true };
+
+        // Ensure default free modules ON
+        ["events.core","todo.core","shopping.core","timer.jobs"].forEach(id => {
+          if (!state.modulePrefs[id]) state.modulePrefs[id] = { enabled:true };
+          else state.modulePrefs[id].enabled = true;
+        });
 
         ensureDataPatched();
 
         await dbSet(FARM_KEY, state.farmData);
         await dbSet(LICENSE_KEY, state.licenses);
         await dbSet(MODULE_PREFS_KEY, state.modulePrefs);
+        await dbSet(PANEL_PREFS_KEY, state.panelPrefs);
 
         syncFarmToForm();
-        renderModules();
-        renderTestModuleSelect();
-        renderWork();
         renderKPIs();
+        renderModules();
+        renderWork();
+        renderDashboard();
+        renderPanelSetup();
         setStatus("Importert ✅");
         input.value = "";
       }
 
+      async function resetFarm() {
+        await dbClearAll();
+        state.farmData = createNewFarm();
+        state.licenses = defaultLicenses();
+        state.modulePrefs = defaultModulePrefs();
+        state.panelPrefs = normalizePanelPrefs(defaultPanelPrefs());
+
+        // Always enable core
+        state.modulePrefs["farm.core"] = { enabled: true };
+        state.modulePrefs["area.core"] = { enabled: true };
+
+        // Enable default free modules
+        ["events.core","todo.core","shopping.core","timer.jobs"].forEach(id => state.modulePrefs[id] = { enabled: true });
+
+        ensureDataPatched();
+
+        await dbSet(FARM_KEY, state.farmData);
+        await dbSet(LICENSE_KEY, state.licenses);
+        await dbSet(MODULE_PREFS_KEY, state.modulePrefs);
+        await dbSet(PANEL_PREFS_KEY, state.panelPrefs);
+
+        syncFarmToForm();
+        renderKPIs();
+        renderModules();
+        renderWork();
+        renderDashboard();
+        renderPanelSetup();
+        setStatus("Ny gård opprettet ✅");
+      }
+
       // =========================
-      //  MODULE STORE UI
+      //  MODULES
+      // =========================
+
+      ModuleRegistry.add({
+        id: "farm.core",
+        title: "Kjerne: Gård",
+        description: "Grunnmodell, lagring og basisfelt (navn/areal).",
+        priceModel: "free",
+        defaultEnabled: true,
+        dependsOn: [],
+        order: 10,
+        dataPatch: (d) => { if (!d.farm.modules.core) d.farm.modules.core = { notes: "" }; },
+        validate: (d) => validateCore(d),
+        calc: () => ({ ok:true }),
+        ui: null,
+        tests: [
+          { name: "farm.core: Ny gård validerer", run: () => {
+            const d = createNewFarm();
+            const v = validateCore(d);
+            if (!v.ok) throw new Error(v.errors.join(" | "));
+          }}
+        ]
+      });
+
+      ModuleRegistry.add({
+        id: "area.core",
+        title: "Kjerne: Areal",
+        description: "Grunnareal som kapasitet.",
+        priceModel: "free",
+        defaultEnabled: true,
+        dependsOn: ["farm.core"],
+        order: 20,
+        dataPatch: (d) => { if (!d.farm.modules.area) d.farm.modules.area = {}; },
+        validate: () => ({ ok:true, errors:[] }),
+        calc: (d) => {
+          const a = d.farm.area;
+          return { totalDaa: (a.dyrketDaa||0) + (a.beiteDaa||0) + (a.utmarkDaa||0) };
+        },
+        ui: null,
+        tests: [{ name:"area.core: total", run: () => {
+          const d=createNewFarm(); d.farm.area={dyrketDaa:1,beiteDaa:2,utmarkDaa:3};
+          const r=ModuleRegistry.get("area.core").calc(d); if(r.totalDaa!==6) throw new Error("Forventet 6");
+        }}]
+      });
+
+      // Hendelser (gratis)
+      ModuleRegistry.add({
+        id: "events.core",
+        title: "Hendelser",
+        description: "Registrer hendelser i drift: vedlikehold, slått, avvik, notater osv.",
+        priceModel: "free",
+        defaultEnabled: true,
+        dependsOn: ["farm.core"],
+        order: 40,
+        dataPatch: (d) => {
+          if (!d.farm.modules.events) d.farm.modules.events = {
+            categories: ["Vedlikehold","Slått","Beite","Sprøyting","Avvik","Notat"],
+            entries: []
+          };
+        },
+        validate: (d) => {
+          const e = d?.farm?.modules?.events;
+          const errors = [];
+          if (!e || !Array.isArray(e.entries)) return { ok:false, errors:["events.entries må være liste."] };
+          for (let i=0;i<e.entries.length;i++){
+            const it = e.entries[i];
+            if (!it?.id) errors.push(`Hendelse ${i+1}: id mangler.`);
+            if (!it?.date) errors.push(`Hendelse ${i+1}: dato mangler.`);
+            if (typeof it?.category !== "string" || !it.category.trim()) errors.push(`Hendelse ${i+1}: kategori mangler.`);
+            if (typeof it?.text !== "string" || !it.text.trim()) errors.push(`Hendelse ${i+1}: tekst mangler.`);
+          }
+          return { ok: errors.length===0, errors };
+        },
+        calc: (d) => ({ count: d.farm.modules.events?.entries?.length ?? 0 }),
+        ui: {
+          render: (host, d, results, api) => {
+            const ev = d.farm.modules.events;
+
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+              <h2>Hendelser</h2>
+              <p class="muted">Legg inn hva som skjedde, når, og hvilken kategori det hører til.</p>
+              <div class="row">
+                <span class="badge free">Antall: ${results?.count ?? 0}</span>
+                <button class="btn" id="btnNewEvent">Ny hendelse</button>
+              </div>
+            `;
+            card.querySelector("#btnNewEvent").addEventListener("click", async () => {
+              await api.actions.newEvent(true);
+            });
+
+            const catCard = document.createElement("div");
+            catCard.className = "card";
+            catCard.innerHTML = `
+              <h2>Kategorier</h2>
+              <div class="row" id="catChips"></div>
+              <div class="row" style="margin-top:10px">
+                <input id="newCat" placeholder="Ny kategori…" />
+                <button class="btn secondary" id="addCat">Legg til</button>
+              </div>
+              <div class="hint">Du kan lage dine egne kategorier.</div>
+            `;
+            const chips = catCard.querySelector("#catChips");
+            ev.categories.forEach(c => {
+              const s = document.createElement("span");
+              s.className = "badge free";
+              s.textContent = c;
+              chips.appendChild(s);
+            });
+            catCard.querySelector("#addCat").addEventListener("click", async () => {
+              const v = (catCard.querySelector("#newCat").value || "").trim();
+              if(!v) return;
+              if(!ev.categories.includes(v)) ev.categories.push(v);
+              catCard.querySelector("#newCat").value = "";
+              await api.saveAndRefresh();
+            });
+
+            const list = document.createElement("div");
+            list.className = "card";
+            list.innerHTML = `<h2>Liste</h2><div id="rows"></div>`;
+            const rows = list.querySelector("#rows");
+
+            ev.entries.forEach((it, i) => {
+              const row = document.createElement("div");
+              row.className = "moduleRow";
+              row.innerHTML = `
+                <div class="moduleMeta">
+                  <div class="moduleTitle">${escapeHtml(it.category)}</div>
+                  <div class="moduleDesc">${escapeHtml(it.date)} · ${escapeHtml(it.text.slice(0,140))}${it.text.length>140?"…":""}</div>
+                </div>
+                <div class="moduleRight">
+                  <div class="moduleActions">
+                    <button class="btn secondary" data-e="edit">Rediger</button>
+                    <button class="btn danger" data-e="del">Slett</button>
+                  </div>
+                </div>`;
+              row.querySelector('[data-e="del"]').addEventListener("click", async () => {
+                if(!confirm("Slette hendelsen?")) return;
+                ev.entries.splice(i,1);
+                await api.saveAndRefresh();
+              });
+              row.querySelector('[data-e="edit"]').addEventListener("click", () => {
+                api.openEditor({
+                  title: "Rediger hendelse",
+                  subtitle: "Dato, kategori og tekst.",
+                  fields: [
+                    { key:"date", label:"Dato (YYYY-MM-DD)", type:"text" },
+                    { key:"category", label:"Kategori", type:"select", options: ev.categories.map(x => [x,x]) },
+                    { key:"text", label:"Tekst", type:"textarea" }
+                  ],
+                  value: it,
+                  onSave: async (nv) => {
+                    ev.entries[i] = { ...it, ...nv };
+                    await api.saveAndRefresh();
+                  }
+                });
+              });
+              rows.appendChild(row);
+            });
+
+            host.appendChild(card);
+            host.appendChild(catCard);
+            host.appendChild(list);
+          }
+        },
+        tests: [{ name:"events.core: validate", run: () => {
+          const d=createNewFarm(); ModuleRegistry.get("events.core").dataPatch(d);
+          d.farm.modules.events.entries=[{id:"1",date:"2026-01-01",category:"Notat",text:"Hei"}];
+          const v=ModuleRegistry.get("events.core").validate(d);
+          if(!v.ok) throw new Error("Skulle være ok");
+        }}]
+      });
+
+      // TO DO (gratis)
+      ModuleRegistry.add({
+        id: "todo.core",
+        title: "TO DO",
+        description: "Gjøremål du må huske.",
+        priceModel: "free",
+        defaultEnabled: true,
+        dependsOn: ["farm.core"],
+        order: 50,
+        dataPatch: (d) => {
+          if (!d.farm.modules.todo) d.farm.modules.todo = { items: [] };
+        },
+        validate: (d) => {
+          const t = d?.farm?.modules?.todo;
+          if (!t || !Array.isArray(t.items)) return { ok:false, errors:["todo.items må være liste."] };
+          return { ok:true, errors:[] };
+        },
+        calc: (d) => {
+          const items = d.farm.modules.todo?.items || [];
+          const open = items.filter(x => !x.done).length;
+          return { total: items.length, open };
+        },
+        ui: {
+          render: (host, d, results, api) => {
+            const t = d.farm.modules.todo;
+
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+              <h2>TO DO</h2>
+              <p class="muted">Hold gjøremål korte. Kryss av når det er gjort.</p>
+              <div class="row">
+                <span class="badge free">Åpne: ${results?.open ?? 0}/${results?.total ?? 0}</span>
+                <button class="btn" id="btnNewTodo">Nytt gjøremål</button>
+                <button class="btn danger" id="btnClearDone">Slett ferdige</button>
+              </div>
+            `;
+            card.querySelector("#btnNewTodo").addEventListener("click", async () => {
+              await api.actions.newTodo(true);
+            });
+            card.querySelector("#btnClearDone").addEventListener("click", async () => {
+              if(!confirm("Slette alle ferdige gjøremål?")) return;
+              t.items = t.items.filter(x => !x.done);
+              await api.saveAndRefresh();
+            });
+
+            const list = document.createElement("div");
+            list.className = "card";
+            list.innerHTML = `<h2>Liste</h2><div id="rows"></div>`;
+            const rows = list.querySelector("#rows");
+
+            t.items.forEach((it, i) => {
+              const row = document.createElement("div");
+              row.className = "moduleRow";
+              row.innerHTML = `
+                <div class="moduleMeta">
+                  <div class="moduleTitle">${it.done ? "✅" : "⬜️"} ${escapeHtml(it.text || "Gjøremål")}</div>
+                  <div class="moduleDesc">${it.dueDate ? ("Frist: "+escapeHtml(it.dueDate)) : ""}</div>
+                </div>
+                <div class="moduleRight">
+                  <div class="moduleActions">
+                    <button class="btn secondary" data-e="toggle">${it.done ? "Angre" : "Ferdig"}</button>
+                    <button class="btn secondary" data-e="edit">Rediger</button>
+                    <button class="btn danger" data-e="del">Slett</button>
+                  </div>
+                </div>`;
+              row.querySelector('[data-e="toggle"]').addEventListener("click", async () => {
+                it.done = !it.done;
+                await api.saveAndRefresh();
+              });
+              row.querySelector('[data-e="del"]').addEventListener("click", async () => {
+                if(!confirm("Slette dette gjøremålet?")) return;
+                t.items.splice(i,1);
+                await api.saveAndRefresh();
+              });
+              row.querySelector('[data-e="edit"]').addEventListener("click", () => {
+                api.openEditor({
+                  title: "Rediger gjøremål",
+                  subtitle: "",
+                  fields: [
+                    { key:"text", label:"Tekst", type:"text" },
+                    { key:"dueDate", label:"Frist (valgfritt, YYYY-MM-DD)", type:"text" }
+                  ],
+                  value: it,
+                  onSave: async (nv) => {
+                    t.items[i] = { ...it, ...nv };
+                    await api.saveAndRefresh();
+                  }
+                });
+              });
+              rows.appendChild(row);
+            });
+
+            host.appendChild(card);
+            host.appendChild(list);
+          }
+        },
+        tests: [{ name:"todo.core: patch", run: () => {
+          const d=createNewFarm(); ModuleRegistry.get("todo.core").dataPatch(d);
+          if(!Array.isArray(d.farm.modules.todo.items)) throw new Error("mangler items");
+        }}]
+      });
+
+      // Handleliste (gratis)
+      ModuleRegistry.add({
+        id: "shopping.core",
+        title: "Handleliste",
+        description: "Hva du må kjøpe inn. Knytt varer til leverandør og hent ut per leverandør.",
+        priceModel: "free",
+        defaultEnabled: true,
+        dependsOn: ["farm.core"],
+        order: 60,
+        dataPatch: (d) => {
+          if (!d.farm.modules.shopping) d.farm.modules.shopping = {
+            suppliers: ["Felleskjøpet","Coop","Bondekompaniet","Annet"],
+            items: []
+          };
+        },
+        validate: (d) => {
+          const s = d?.farm?.modules?.shopping;
+          if (!s || !Array.isArray(s.items) || !Array.isArray(s.suppliers)) return { ok:false, errors:["shopping.items/suppliers må være lister."] };
+          return { ok:true, errors:[] };
+        },
+        calc: (d) => {
+          const items = d.farm.modules.shopping?.items || [];
+          const open = items.filter(x => !x.bought).length;
+          return { total: items.length, open };
+        },
+        ui: {
+          render: (host, d, results, api) => {
+            const s = d.farm.modules.shopping;
+
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+              <h2>Handleliste</h2>
+              <p class="muted">Legg inn ting du må kjøpe. Velg leverandør, så kan du hente ut liste per leverandør.</p>
+              <div class="row">
+                <span class="badge free">Åpne: ${results?.open ?? 0}/${results?.total ?? 0}</span>
+                <button class="btn" id="btnNewShop">Ny vare</button>
+                <button class="btn danger" id="btnClearBought">Slett kjøpt</button>
+              </div>
+            `;
+            card.querySelector("#btnNewShop").addEventListener("click", async () => {
+              await api.actions.newShoppingItem(true);
+            });
+            card.querySelector("#btnClearBought").addEventListener("click", async () => {
+              if(!confirm("Slette alt som er markert kjøpt?")) return;
+              s.items = s.items.filter(x => !x.bought);
+              await api.saveAndRefresh();
+            });
+
+            const supCard = document.createElement("div");
+            supCard.className = "card";
+            supCard.innerHTML = `
+              <h2>Leverandører</h2>
+              <div class="row" id="supChips"></div>
+              <div class="row" style="margin-top:10px">
+                <input id="newSup" placeholder="Ny leverandør…" />
+                <button class="btn secondary" id="addSup">Legg til</button>
+              </div>
+              <hr/>
+              <label class="field">
+                <span>Hent ut handleliste for leverandør</span>
+                <select id="supSelect"></select>
+              </label>
+              <div class="row" style="margin-top:10px">
+                <button class="btn secondary" id="btnCopy">Kopier liste</button>
+                <button class="btn" id="btnDownload">Last ned liste</button>
+              </div>
+              <div class="small" id="supInfo"></div>
+            `;
+            const chips = supCard.querySelector("#supChips");
+            s.suppliers.forEach(x => {
+              const b = document.createElement("span");
+              b.className = "badge free";
+              b.textContent = x;
+              chips.appendChild(b);
+            });
+
+            const supSelect = supCard.querySelector("#supSelect");
+            function fillSupSelect(){
+              supSelect.innerHTML = "";
+              s.suppliers.forEach(x => {
+                const opt = document.createElement("option");
+                opt.value = x; opt.textContent = x;
+                supSelect.appendChild(opt);
+              });
+            }
+            fillSupSelect();
+
+            supCard.querySelector("#addSup").addEventListener("click", async () => {
+              const v = (supCard.querySelector("#newSup").value || "").trim();
+              if(!v) return;
+              if(!s.suppliers.includes(v)) s.suppliers.push(v);
+              supCard.querySelector("#newSup").value = "";
+              await api.saveAndRefresh();
+            });
+
+            function getSupplierListText(supplier){
+              const openItems = (s.items || []).filter(it => !it.bought && it.supplier === supplier);
+              const lines = openItems.map(it => {
+                const qty = it.qty ? ` (${it.qty})` : "";
+                return `- ${it.name}${qty}`;
+              });
+              return `Handleliste – ${supplier}\n\n${lines.join("\n") || "(ingen åpne varer)"}`;
+            }
+
+            async function copyText(text){
+              try { await navigator.clipboard.writeText(text); return true; }
+              catch {
+                const ta = document.createElement("textarea");
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                const ok = document.execCommand("copy");
+                ta.remove();
+                return ok;
+              }
+            }
+
+            function downloadText(filename, text){
+              const blob = new Blob([text], { type: "text/plain" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = filename;
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+              URL.revokeObjectURL(url);
+            }
+
+            function updateSupInfo(){
+              const supplier = supSelect.value;
+              const count = (s.items || []).filter(it => !it.bought && it.supplier === supplier).length;
+              supCard.querySelector("#supInfo").textContent = `Åpne varer hos ${supplier}: ${count}`;
+            }
+            supSelect.addEventListener("change", updateSupInfo);
+            updateSupInfo();
+
+            supCard.querySelector("#btnCopy").addEventListener("click", async () => {
+              const t = getSupplierListText(supSelect.value);
+              const ok = await copyText(t);
+              alert(ok ? "Kopiert ✅" : "Klarte ikke kopiere.");
+            });
+            supCard.querySelector("#btnDownload").addEventListener("click", () => {
+              const sup = supSelect.value;
+              const t = getSupplierListText(sup);
+              const safe = sup.toLowerCase().replace(/[^a-z0-9]+/g,"-");
+              downloadText(`handleliste-${safe}.txt`, t);
+            });
+
+            const list = document.createElement("div");
+            list.className = "card";
+            list.innerHTML = `<h2>Varer</h2><div id="rows"></div>`;
+            const rows = list.querySelector("#rows");
+
+            s.items.forEach((it, i) => {
+              const row = document.createElement("div");
+              row.className = "moduleRow";
+              row.innerHTML = `
+                <div class="moduleMeta">
+                  <div class="moduleTitle">${it.bought ? "✅" : "🛒"} ${escapeHtml(it.name || "Vare")}</div>
+                  <div class="moduleDesc">Leverandør: <b>${escapeHtml(it.supplier || "—")}</b>${it.qty?(" · Mengde: "+escapeHtml(it.qty)):""}</div>
+                </div>
+                <div class="moduleRight">
+                  <div class="moduleActions">
+                    <button class="btn secondary" data-e="toggle">${it.bought ? "Angre" : "Kjøpt"}</button>
+                    <button class="btn secondary" data-e="edit">Rediger</button>
+                    <button class="btn danger" data-e="del">Slett</button>
+                  </div>
+                </div>`;
+              row.querySelector('[data-e="toggle"]').addEventListener("click", async () => {
+                it.bought = !it.bought;
+                await api.saveAndRefresh();
+              });
+              row.querySelector('[data-e="del"]').addEventListener("click", async () => {
+                if(!confirm("Slette denne varen?")) return;
+                s.items.splice(i,1);
+                await api.saveAndRefresh();
+              });
+              row.querySelector('[data-e="edit"]').addEventListener("click", () => {
+                api.openEditor({
+                  title: "Rediger vare",
+                  subtitle: "Velg leverandør for å hente ut per leverandør.",
+                  fields: [
+                    { key:"name", label:"Vare", type:"text" },
+                    { key:"qty", label:"Mengde (valgfritt)", type:"text" },
+                    { key:"supplier", label:"Leverandør", type:"select", options: s.suppliers.map(x => [x,x]) }
+                  ],
+                  value: it,
+                  onSave: async (nv) => {
+                    s.items[i] = { ...it, ...nv };
+                    await api.saveAndRefresh();
+                  }
+                });
+              });
+              rows.appendChild(row);
+            });
+
+            host.appendChild(card);
+            host.appendChild(supCard);
+            host.appendChild(list);
+          }
+        },
+        tests: [{ name:"shopping.core: patch", run: () => {
+          const d=createNewFarm(); ModuleRegistry.get("shopping.core").dataPatch(d);
+          if(!d.farm.modules.shopping) throw new Error("mangler");
+        }}]
+      });
+
+      // Jobbklokke (gratis) – Start jobb / Stop jobb + ufakturerte jobber
+      ModuleRegistry.add({
+        id: "timer.jobs",
+        title: "Jobbklokke",
+        description: "Start/stop klokke på jobber (kunde + oppdrag). Lagres i ufakturerte jobber.",
+        priceModel: "free",
+        defaultEnabled: true,
+        dependsOn: ["farm.core"],
+        order: 65,
+        dataPatch: (d) => {
+          if (!d.farm.modules.jobTimer) d.farm.modules.jobTimer = {
+            running: null, // {id, customer, task, note, startedAt}
+            sessions: []   // each: {id, customer, task, note, startedAt, endedAt, minutes, status: 'unbilled'|'billed'}
+          };
+        },
+        validate: (d) => {
+          const jt = d?.farm?.modules?.jobTimer;
+          if (!jt) return { ok:false, errors:["jobTimer mangler."] };
+          if (!Array.isArray(jt.sessions)) return { ok:false, errors:["jobTimer.sessions må være liste."] };
+          return { ok:true, errors:[] };
+        },
+        calc: (d) => {
+          const jt = d.farm.modules.jobTimer;
+          const unbilled = (jt.sessions || []).filter(x => x.status === "unbilled").length;
+          const running = !!jt.running;
+          return { unbilled, running };
+        },
+        ui: {
+          render: (host, d, results, api) => {
+            const jt = d.farm.modules.jobTimer;
+
+            const card = document.createElement("div");
+            card.className = "card";
+            const runningTxt = jt.running ? `Pågår: <b>${escapeHtml(jt.running.customer)}</b> · ${escapeHtml(jt.running.task)}` : "Ingen jobb pågår.";
+            card.innerHTML = `
+              <h2>Jobbklokke</h2>
+              <p class="muted">${runningTxt}</p>
+              <div class="row">
+                <span class="badge free">Ufakturerte: ${results?.unbilled ?? 0}</span>
+                <button class="btn" id="btnStartStop">${jt.running ? "Stopp jobb" : "Start jobb"}</button>
+              </div>
+              <div class="hint">Start: skriv inn kunde + hva du gjør. Stopp: økta lagres som ufakturert.</div>
+            `;
+            card.querySelector("#btnStartStop").addEventListener("click", async () => {
+              if (jt.running) await api.actions.stopJob(true);
+              else await api.actions.startJob(true);
+            });
+
+            const list = document.createElement("div");
+            list.className = "card";
+            const unbilled = (jt.sessions || []).filter(x => x.status === "unbilled");
+            list.innerHTML = `<h2>Ufakturerte jobber</h2><div id="rows"></div>`;
+            const rows = list.querySelector("#rows");
+
+            if (!unbilled.length) {
+              const n = document.createElement("div");
+              n.className = "note";
+              n.textContent = "Ingen ufakturerte jobber ennå.";
+              rows.appendChild(n);
+            } else {
+              unbilled.forEach((s, i) => {
+                const row = document.createElement("div");
+                row.className = "moduleRow";
+                const dur = (s.minutes ?? 0);
+                row.innerHTML = `
+                  <div class="moduleMeta">
+                    <div class="moduleTitle">${escapeHtml(s.customer)} · ${escapeHtml(s.task)}</div>
+                    <div class="moduleDesc">${fmtDate(s.startedAt)} → ${fmtDate(s.endedAt)} · <b>${dur}</b> min${s.note ? (" · "+escapeHtml(s.note)) : ""}</div>
+                  </div>
+                  <div class="moduleRight">
+                    <div class="moduleActions">
+                      <button class="btn secondary" data-e="bill">Marker fakturert</button>
+                      <button class="btn danger" data-e="del">Slett</button>
+                    </div>
+                  </div>
+                `;
+                row.querySelector('[data-e="bill"]').addEventListener("click", async () => {
+                  // find by id
+                  const idx = jt.sessions.findIndex(x => x.id === s.id);
+                  if (idx >= 0) jt.sessions[idx].status = "billed";
+                  await api.saveAndRefresh();
+                });
+                row.querySelector('[data-e="del"]').addEventListener("click", async () => {
+                  if (!confirm("Slette denne jobbøkta?")) return;
+                  const idx = jt.sessions.findIndex(x => x.id === s.id);
+                  if (idx >= 0) jt.sessions.splice(idx, 1);
+                  await api.saveAndRefresh();
+                });
+                rows.appendChild(row);
+              });
+            }
+
+            host.appendChild(card);
+            host.appendChild(list);
+          }
+        },
+        tests: [{ name:"timer.jobs: patch", run: () => {
+          const d=createNewFarm(); ModuleRegistry.get("timer.jobs").dataPatch(d);
+          if(!d.farm.modules.jobTimer) throw new Error("mangler jobTimer");
+        }}]
+      });
+
+      // Arealenheter/skifter (paid)
+      ModuleRegistry.add({
+        id: "area.units",
+        title: "Areal: Skifter",
+        description: "Detaljert arealstyring per skifte/enhet.",
+        priceModel: "paid",
+        defaultEnabled: false,
+        dependsOn: ["farm.core","area.core"],
+        order: 70,
+        dataPatch: (d) => {
+          if (!d.farm.modules.areaUnits) d.farm.modules.areaUnits = { units: [] };
+        },
+        validate: (d) => {
+          const mod = d?.farm?.modules?.areaUnits;
+          if (!mod || !Array.isArray(mod.units)) return { ok:false, errors:["areaUnits.units må være liste."] };
+          return { ok:true, errors:[] };
+        },
+        calc: (d) => ({ total: d.farm.modules.areaUnits?.units?.length ?? 0 }),
+        ui: {
+          render: (host, d, results, api) => {
+            const mod = d.farm.modules.areaUnits;
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+              <h2>Skifter</h2>
+              <div class="row">
+                <span class="badge free">Antall: ${results?.total ?? 0}</span>
+                <button class="btn" id="btnNewField">Nytt skifte</button>
+              </div>
+              <div class="hint">Enkelt i starten: navn + daa.</div>
+            `;
+            card.querySelector("#btnNewField").addEventListener("click", async () => {
+              await api.actions.newFieldUnit(true);
+            });
+
+            const list = document.createElement("div");
+            list.className = "card";
+            list.innerHTML = `<h2>Liste</h2><div id="rows"></div>`;
+            const rows = list.querySelector("#rows");
+
+            mod.units.forEach((u, i) => {
+              const row = document.createElement("div");
+              row.className = "moduleRow";
+              row.innerHTML = `
+                <div class="moduleMeta">
+                  <div class="moduleTitle">${escapeHtml(u.name || "Skifte")}</div>
+                  <div class="moduleDesc">${escapeHtml(u.type || "dyrket")} · ${Number(u.areaDaa||0).toFixed(1)} daa</div>
+                </div>
+                <div class="moduleRight">
+                  <div class="moduleActions">
+                    <button class="btn secondary" data-e="edit">Rediger</button>
+                    <button class="btn danger" data-e="del">Slett</button>
+                  </div>
+                </div>`;
+              row.querySelector('[data-e="del"]').addEventListener("click", async () => {
+                if(!confirm("Slette skiftet?")) return;
+                mod.units.splice(i,1);
+                await api.saveAndRefresh();
+              });
+              row.querySelector('[data-e="edit"]').addEventListener("click", () => {
+                api.openEditor({
+                  title: "Rediger skifte",
+                  subtitle: "",
+                  fields: [
+                    { key:"name", label:"Navn", type:"text" },
+                    { key:"type", label:"Type", type:"select", options:[
+                      ["dyrket","Dyrket"],["innmarksbeite","Innmarksbeite"],["utmark","Utmark"],["annet","Annet"]
+                    ]},
+                    { key:"areaDaa", label:"Areal (daa)", type:"number" }
+                  ],
+                  value: u,
+                  onSave: async (nv) => {
+                    nv.areaDaa = Number(nv.areaDaa);
+                    mod.units[i] = { ...u, ...nv };
+                    await api.saveAndRefresh();
+                  }
+                });
+              });
+              rows.appendChild(row);
+            });
+
+            host.appendChild(card);
+            host.appendChild(list);
+          }
+        },
+        tests: [{ name:"area.units: patch", run: () => {
+          const d=createNewFarm(); ModuleRegistry.get("area.units").dataPatch(d);
+          if(!d.farm.modules.areaUnits) throw new Error("mangler");
+        }}]
+      });
+
+      // =========================
+      //  ACTIONS (used by tiles + modules)
+      // =========================
+      function createActions(){
+        const ensureEnabledOrUnlock = async (moduleId) => {
+          const mod = ModuleRegistry.get(moduleId);
+          const allowed = licenseAllows(moduleId) || mod?.priceModel === "free";
+          if (!allowed) { openLicenseModal(moduleId); return false; }
+          if (!isEnabled(moduleId)) await setEnabled(moduleId, true);
+          ensureDataPatched();
+          return true;
+        };
+
+        const refreshAll = async (goToWork) => {
+          await saveFarm();
+          syncFarmToForm();
+          renderKPIs();
+          renderWork();
+          renderDashboard();
+          renderPanelSetup();
+          renderModules();
+          if (goToWork) routeTo("work");
+        };
+
+        const minutesBetween = (startIso, endIso) => {
+          const a = new Date(startIso).getTime();
+          const b = new Date(endIso).getTime();
+          if (!Number.isFinite(a) || !Number.isFinite(b) || b < a) return 0;
+          return Math.round((b - a) / 60000);
+        };
+
+        return {
+          openModule: async (moduleId) => {
+            const mod = ModuleRegistry.get(moduleId);
+            const allowed = licenseAllows(moduleId) || mod?.priceModel === "free";
+            if (!allowed) { openLicenseModal(moduleId); return; }
+            if (!isEnabled(moduleId)) await setEnabled(moduleId, true); // no questions (your rule)
+            ensureDataPatched();
+            await refreshAll(true);
+            // scroll to module card by id label
+            setTimeout(() => {
+              const cards = [...document.querySelectorAll("#workHost .card")];
+              const target = cards.find(c => (c.textContent || "").includes(moduleId));
+              if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 150);
+          },
+
+          newEvent: async (goToWork=false) => {
+            const ok = await ensureEnabledOrUnlock("events.core");
+            if (!ok) return;
+            const ev = state.farmData.farm.modules.events;
+
+            const newItem = {
+              id: crypto.randomUUID?.() || String(Date.now()),
+              date: nowIso().slice(0,10),
+              category: ev.categories?.[0] || "Notat",
+              text: ""
+            };
+            ev.entries.unshift(newItem);
+
+            openEditor({
+              title: "Ny hendelse",
+              subtitle: "Velg kategori og skriv tekst.",
+              fields: [
+                { key:"date", label:"Dato (YYYY-MM-DD)", type:"text" },
+                { key:"category", label:"Kategori", type:"select", options: (ev.categories||["Notat"]).map(x => [x,x]) },
+                { key:"text", label:"Tekst", type:"textarea" }
+              ],
+              value: newItem,
+              onSave: async (nv) => {
+                ev.entries[0] = { ...ev.entries[0], ...nv };
+                await refreshAll(goToWork);
+              }
+            });
+          },
+
+          newTodo: async (goToWork=false) => {
+            const ok = await ensureEnabledOrUnlock("todo.core");
+            if (!ok) return;
+            const t = state.farmData.farm.modules.todo;
+            const it = { id: crypto.randomUUID?.()||String(Date.now()), text:"", dueDate:"", done:false };
+            t.items.unshift(it);
+
+            openEditor({
+              title: "Nytt gjøremål",
+              subtitle: "Kort tekst – evt. frist.",
+              fields: [
+                { key:"text", label:"Tekst", type:"text" },
+                { key:"dueDate", label:"Frist (valgfritt, YYYY-MM-DD)", type:"text" }
+              ],
+              value: it,
+              onSave: async (nv) => {
+                t.items[0] = { ...t.items[0], ...nv };
+                await refreshAll(goToWork);
+              }
+            });
+          },
+
+          newShoppingItem: async (goToWork=false) => {
+            const ok = await ensureEnabledOrUnlock("shopping.core");
+            if (!ok) return;
+            const s = state.farmData.farm.modules.shopping;
+            const it = {
+              id: crypto.randomUUID?.()||String(Date.now()),
+              name:"",
+              qty:"",
+              supplier: s.suppliers?.[0] || "Annet",
+              bought:false
+            };
+            s.items.unshift(it);
+
+            openEditor({
+              title: "Ny vare",
+              subtitle: "Velg leverandør for å hente ut per leverandør.",
+              fields: [
+                { key:"name", label:"Vare", type:"text" },
+                { key:"qty", label:"Mengde (valgfritt)", type:"text" },
+                { key:"supplier", label:"Leverandør", type:"select", options: (s.suppliers||["Annet"]).map(x => [x,x]) }
+              ],
+              value: it,
+              onSave: async (nv) => {
+                s.items[0] = { ...s.items[0], ...nv };
+                await refreshAll(goToWork);
+              }
+            });
+          },
+
+          startJob: async (goToWork=false) => {
+            const ok = await ensureEnabledOrUnlock("timer.jobs");
+            if (!ok) return;
+            const jt = state.farmData.farm.modules.jobTimer;
+
+            if (jt.running) {
+              alert("En jobb pågår allerede. Stopp den først.");
+              return;
+            }
+
+            const draft = { customer:"", task:"", note:"" };
+            openEditor({
+              title: "Start jobb",
+              subtitle: "Skriv inn kunde og hva du gjør.",
+              fields: [
+                { key:"customer", label:"Kunde", type:"text" },
+                { key:"task", label:"Hva gjør du", type:"text" },
+                { key:"note", label:"Notat (valgfritt)", type:"text" }
+              ],
+              value: draft,
+              onSave: async (nv) => {
+                const customer = (nv.customer||"").trim();
+                const task = (nv.task||"").trim();
+                if (!customer || !task) {
+                  alert("Fyll inn både Kunde og Hva gjør du.");
+                  return;
+                }
+                jt.running = {
+                  id: crypto.randomUUID?.() || String(Date.now()),
+                  customer, task,
+                  note: (nv.note||"").trim(),
+                  startedAt: nowIso()
+                };
+                await refreshAll(goToWork);
+              }
+            });
+          },
+
+          stopJob: async (goToWork=false) => {
+            const ok = await ensureEnabledOrUnlock("timer.jobs");
+            if (!ok) return;
+            const jt = state.farmData.farm.modules.jobTimer;
+
+            if (!jt.running) {
+              alert("Ingen jobb pågår.");
+              return;
+            }
+
+            const end = nowIso();
+            const r = jt.running;
+            jt.sessions.unshift({
+              id: r.id,
+              customer: r.customer,
+              task: r.task,
+              note: r.note || "",
+              startedAt: r.startedAt,
+              endedAt: end,
+              minutes: minutesBetween(r.startedAt, end),
+              status: "unbilled"
+            });
+            jt.running = null;
+            await refreshAll(goToWork);
+          },
+
+          newFieldUnit: async (goToWork=false) => {
+            const ok = await ensureEnabledOrUnlock("area.units");
+            if (!ok) return;
+            const a = state.farmData.farm.modules.areaUnits;
+            const it = { id: crypto.randomUUID?.()||String(Date.now()), name:"", type:"dyrket", areaDaa:1 };
+            a.units.unshift(it);
+
+            openEditor({
+              title: "Nytt skifte",
+              subtitle: "",
+              fields: [
+                { key:"name", label:"Navn", type:"text" },
+                { key:"type", label:"Type", type:"select", options:[
+                  ["dyrket","Dyrket"],["innmarksbeite","Innmarksbeite"],["utmark","Utmark"],["annet","Annet"]
+                ]},
+                { key:"areaDaa", label:"Areal (daa)", type:"number" }
+              ],
+              value: it,
+              onSave: async (nv) => {
+                nv.areaDaa = Number(nv.areaDaa);
+                a.units[0] = { ...a.units[0], ...nv };
+                await refreshAll(goToWork);
+              }
+            });
+          }
+        };
+      }
+
+      // =========================
+      //  PANEL PREFS (pinned + order + visibility)
+      // =========================
+      function getPinnedActionIds() {
+        // Your fixed 3 shortcuts (moveable, not removable)
+        return ["events.new", "shopping.new", "todo.new"];
+      }
+
+      function normalizePanelPrefs(pp) {
+        const pinned = getPinnedActionIds();
+        const out = {
+          visible: (pp && typeof pp.visible === "object") ? { ...pp.visible } : {},
+          order: Array.isArray(pp?.order) ? pp.order.slice() : []
+        };
+
+        // Ensure pinned always visible
+        for (const id of pinned) out.visible[id] = true;
+
+        // Ensure order contains pinned (keep existing order, but add missing)
+        const seen = new Set(out.order);
+        // Remove unknown (optional: we keep unknown, but it can break. safer to keep only existing actions + module actions)
+        out.order = out.order.filter(x => typeof x === "string" && x.trim());
+
+        for (const id of pinned) {
+          if (!out.order.includes(id)) out.order.unshift(id);
+        }
+
+        // Ensure order only unique
+        const uniq = [];
+        const seen2 = new Set();
+        for (const id of out.order) {
+          if (seen2.has(id)) continue;
+          seen2.add(id);
+          uniq.push(id);
+        }
+        out.order = uniq;
+
+        return out;
+      }
+
+      async function savePanelPrefs() {
+        state.panelPrefs = normalizePanelPrefs(state.panelPrefs);
+        await dbSet(PANEL_PREFS_KEY, state.panelPrefs);
+      }
+
+      function panelIsVisible(actionId) {
+        return !!state.panelPrefs?.visible?.[actionId];
+      }
+
+      async function panelSetVisible(actionId, visible) {
+        // pinned cannot be turned off
+        if (getPinnedActionIds().includes(actionId)) visible = true;
+
+        state.panelPrefs.visible[actionId] = !!visible;
+
+        // If turning on, ensure it's in order
+        if (visible && !state.panelPrefs.order.includes(actionId)) {
+          state.panelPrefs.order.push(actionId);
+        }
+
+        await savePanelPrefs();
+        renderDashboard();
+        renderPanelSetup();
+      }
+
+      async function panelMove(actionId, dir) {
+        const order = state.panelPrefs.order.slice();
+        const idx = order.indexOf(actionId);
+        if (idx < 0) return;
+
+        const swapWith = dir === "up" ? idx - 1 : idx + 1;
+        if (swapWith < 0 || swapWith >= order.length) return;
+
+        // Swap
+        [order[idx], order[swapWith]] = [order[swapWith], order[idx]];
+        state.panelPrefs.order = order;
+
+        await savePanelPrefs();
+        renderDashboard();
+        renderPanelSetup();
+      }
+
+      // =========================
+      //  ACTIONS REGISTERED (fixed + optional + module shortcuts)
+      // =========================
+      function registerBaseActions() {
+        const actions = createActions();
+
+        // Fixed pinned
+        ActionRegistry.set("events.new", {
+          title: () => "Ny hendelse",
+          subtitle: () => "Velg kategori",
+          iconSvg: () => ICONS.event,
+          isPinned: true,
+          isToggleable: false,
+          run: async () => actions.newEvent(false)
+        });
+
+        ActionRegistry.set("shopping.new", {
+          title: () => "Ny vare",
+          subtitle: () => "Handleliste",
+          iconSvg: () => ICONS.shop,
+          isPinned: true,
+          isToggleable: false,
+          run: async () => actions.newShoppingItem(false)
+        });
+
+        ActionRegistry.set("todo.new", {
+          title: () => "Nytt gjøremål",
+          subtitle: () => "TO DO",
+          iconSvg: () => ICONS.todo,
+          isPinned: true,
+          isToggleable: false,
+          run: async () => actions.newTodo(false)
+        });
+
+        // Optional actions
+        ActionRegistry.set("job.toggle", {
+          title: () => {
+            const jt = state.farmData?.farm?.modules?.jobTimer;
+            return jt?.running ? "Stopp jobb" : "Start jobb";
+          },
+          subtitle: () => {
+            const jt = state.farmData?.farm?.modules?.jobTimer;
+            if (!jt?.running) return "Kunde + oppdrag";
+            return `${jt.running.customer} · ${jt.running.task}`.slice(0, 40);
+          },
+          iconSvg: () => ICONS.clock,
+          isPinned: false,
+          isToggleable: true,
+          run: async () => {
+            const jt = state.farmData?.farm?.modules?.jobTimer;
+            if (jt?.running) await actions.stopJob(false);
+            else await actions.startJob(false);
+          }
+        });
+
+        ActionRegistry.set("weather.yr", {
+          title: () => "Vær (yr.no)",
+          subtitle: () => "Åpner i ny fane",
+          iconSvg: () => ICONS.weather,
+          isPinned: false,
+          isToggleable: true,
+          run: async () => {
+            window.open("https://www.yr.no", "_blank", "noopener,noreferrer");
+          }
+        });
+      }
+
+      function ensureModuleShortcutAction(moduleId) {
+        const actionId = `module.open:${moduleId}`;
+        if (ActionRegistry.has(actionId)) return actionId;
+
+        const mod = ModuleRegistry.get(moduleId);
+        const actions = createActions();
+
+        ActionRegistry.set(actionId, {
+          title: () => mod?.title || moduleId,
+          subtitle: () => "Åpne modul",
+          iconSvg: () => ICONS.module,
+          isPinned: false,
+          isToggleable: true,
+          run: async () => actions.openModule(moduleId)
+        });
+
+        return actionId;
+      }
+
+      // =========================
+      //  KONTROLLPANEL (tiles)
+      // =========================
+      function renderDashboard(){
+        const host = $("#dashboardTiles");
+        const hint = $("#dashboardHint");
+        host.innerHTML = "";
+
+        // Ensure order includes pinned at least, and remove actionIds that are no longer known (but keep module actions; they are known once ensured)
+        state.panelPrefs = normalizePanelPrefs(state.panelPrefs);
+
+        const visibleIds = state.panelPrefs.order.filter(id => panelIsVisible(id));
+
+        if (!visibleIds.length) {
+          hint.textContent = "Ingen knapper valgt. Trykk 🧩 Panel og slå på snarveier.";
+          return;
+        }
+        hint.textContent = "";
+
+        visibleIds.forEach(actionId => {
+          const def = ActionRegistry.get(actionId);
+          // If unknown (e.g., module shortcut not registered yet), skip
+          if (!def) return;
+
+          const tile = document.createElement("div");
+          tile.className = "tile";
+          tile.innerHTML = `
+            <div class="tileIcon">${def.iconSvg?.() || ""}</div>
+            <div class="tileText">
+              <div class="tileTitle">${escapeHtml(def.title?.() || actionId)}</div>
+              <div class="tileSub">${escapeHtml(def.subtitle?.() || "")}</div>
+            </div>
+          `;
+          tile.addEventListener("click", async () => {
+            try {
+              await def.run();
+              // Re-render in case title/subtitle changed (job toggle)
+              renderDashboard();
+              renderKPIs();
+            } catch (e) {
+              alert("Noe gikk galt: " + (e?.message || String(e)));
+            }
+          });
+          host.appendChild(tile);
+        });
+      }
+
+      function renderPanelSetup(){
+        const host = $("#panelSetupList");
+        host.innerHTML = "";
+
+        state.panelPrefs = normalizePanelPrefs(state.panelPrefs);
+
+        // Build a list of all toggleable actions + pinned
+        const ids = state.panelPrefs.order.slice(); // order determines display in setup too
+
+        // Ensure optional base actions exist in setup even if not in order
+        // (job/weather)
+        for (const extraId of ["job.toggle","weather.yr"]) {
+          if (!state.panelPrefs.order.includes(extraId)) {
+            // not adding to order automatically (until user turns it on),
+            // but we want it visible in setup list: add temporarily at end
+            ids.push(extraId);
+          }
+        }
+
+        // Add module shortcut actions that exist in visible map but not in order (safety)
+        for (const [id, vis] of Object.entries(state.panelPrefs.visible || {})) {
+          if (!ids.includes(id)) ids.push(id);
+        }
+
+        // Deduplicate
+        const seen = new Set();
+        const finalIds = [];
+        for (const id of ids) {
+          if (seen.has(id)) continue;
+          seen.add(id);
+          finalIds.push(id);
+        }
+
+        finalIds.forEach((actionId, idx) => {
+          const def = ActionRegistry.get(actionId);
+          if (!def) return;
+
+          const pinned = getPinnedActionIds().includes(actionId);
+          const on = panelIsVisible(actionId);
+
+          const row = document.createElement("div");
+          row.className = "moduleRow";
+          row.innerHTML = `
+            <div class="moduleMeta">
+              <div class="moduleTitle">${escapeHtml(def.title?.() || actionId)} ${pinned ? `<span class="badge free">Basis</span>` : ``}</div>
+              <div class="moduleDesc">${escapeHtml(def.subtitle?.() || "")}</div>
+            </div>
+            <div class="moduleRight">
+              <div class="moduleActions">
+                <button class="btn secondary small" data-m="up">⬆</button>
+                <button class="btn secondary small" data-m="down">⬇</button>
+                <button class="btn ${on ? "secondary":""} small" data-t="toggle">${on ? "På" : "Av"}</button>
+              </div>
+            </div>
+          `;
+
+          // move only if in order
+          row.querySelector('[data-m="up"]').addEventListener("click", async () => {
+            if (!state.panelPrefs.order.includes(actionId)) {
+              // if not in order yet, add and place near end
+              state.panelPrefs.order.push(actionId);
+              await savePanelPrefs();
+            }
+            await panelMove(actionId, "up");
+          });
+          row.querySelector('[data-m="down"]').addEventListener("click", async () => {
+            if (!state.panelPrefs.order.includes(actionId)) {
+              state.panelPrefs.order.push(actionId);
+              await savePanelPrefs();
+            }
+            await panelMove(actionId, "down");
+          });
+
+          row.querySelector('[data-t="toggle"]').addEventListener("click", async () => {
+            // pinned cannot go off
+            if (pinned) {
+              await panelSetVisible(actionId, true);
+              return;
+            }
+            await panelSetVisible(actionId, !on);
+          });
+
+          host.appendChild(row);
+        });
+      }
+
+      // =========================
+      //  MODULE STORE UI + shortcut toggle from Moduler
       // =========================
       function priceText(m) {
         if (m.priceModel === "free") return "Gratis";
         if (m.priceModel === "paid") return "Engangskjøp";
-        if (m.priceModel === "subscription") return "Abonnement";
         return "—";
+      }
+
+      function isModuleShortcutOn(moduleId) {
+        const actionId = `module.open:${moduleId}`;
+        return !!state.panelPrefs?.visible?.[actionId];
+      }
+
+      async function setModuleShortcut(moduleId, on) {
+        const actionId = ensureModuleShortcutAction(moduleId);
+        await panelSetVisible(actionId, on);
+        // ensure in order if on
+        if (on && !state.panelPrefs.order.includes(actionId)) {
+          state.panelPrefs.order.push(actionId);
+          await savePanelPrefs();
+        }
+        renderDashboard();
+        renderPanelSetup();
       }
 
       function renderModules() {
@@ -1554,73 +2141,57 @@
         host.innerHTML = "";
 
         const sorted = ModuleRegistry.list().slice().sort((a,b) => (a.order||999)-(b.order||999));
-
         for (const m of sorted) {
           const lic = licenseLabel(m.id);
           const enabled = isEnabled(m.id);
           const allowed = licenseAllows(m.id) || m.priceModel === "free";
           const deps = (m.dependsOn || []).join(", ");
 
+          const shortcutOn = isModuleShortcutOn(m.id);
+
           const row = document.createElement("div");
           row.className = "moduleRow";
-
-          const left = document.createElement("div");
-          left.className = "moduleMeta";
-          left.innerHTML = `
-            <div class="moduleTitle">${escapeHtml(m.title)}</div>
-            <div class="moduleDesc">${escapeHtml(m.description)}</div>
-            <div class="small">
-              <span class="pill">ID: ${escapeHtml(m.id)}</span>
-              <span class="pill">Pris: ${escapeHtml(priceText(m))}</span>
-              ${deps ? `<span class="pill">Avhengig av: ${escapeHtml(deps)}</span>` : ``}
+          row.innerHTML = `
+            <div class="moduleMeta">
+              <div class="moduleTitle">${escapeHtml(m.title)}</div>
+              <div class="moduleDesc">${escapeHtml(m.description)}</div>
+              <div class="small">
+                <span class="badge ${lic.cls}">${escapeHtml(lic.text)}</span>
+                <span class="badge ${enabled ? "on":"off"}">${enabled ? "På":"Av"}</span>
+                <span class="badge free">Pris: ${escapeHtml(priceText(m))}</span>
+                ${deps ? `<span class="badge free">Avhengig av: ${escapeHtml(deps)}</span>` : ``}
+                <span class="badge ${shortcutOn ? "on":"off"}">Snarvei: ${shortcutOn ? "På" : "Av"}</span>
+              </div>
+            </div>
+            <div class="moduleRight">
+              <div class="moduleActions">
+                <button class="btn secondary" data-act="toggle">${enabled ? "Skru av":"Skru på"}</button>
+                <button class="btn" data-act="unlock">${allowed ? "Administrer":"Lås opp"}</button>
+                <button class="btn secondary" data-act="shortcut">${shortcutOn ? "Fjern snarvei" : "Legg til snarvei"}</button>
+              </div>
             </div>
           `;
 
-          const right = document.createElement("div");
-          right.className = "moduleRight";
-
-          const topBadges = document.createElement("div");
-          topBadges.innerHTML = `
-            <span class="badge ${lic.cls}">${escapeHtml(lic.text)}</span>
-            <span class="badge ${enabled ? "on" : "off"}">${enabled ? "På" : "Av"}</span>
-          `;
-
-          const actions = document.createElement("div");
-          actions.className = "moduleActions";
-
-          const btnToggle = document.createElement("button");
-          btnToggle.className = "btn secondary";
-          btnToggle.textContent = enabled ? "Skru av" : "Skru på";
-          btnToggle.disabled = !allowed;
-          btnToggle.addEventListener("click", async () => {
+          row.querySelector('[data-act="unlock"]').addEventListener("click", () => openLicenseModal(m.id));
+          row.querySelector('[data-act="toggle"]').addEventListener("click", async () => {
+            if (!allowed && !enabled) { openLicenseModal(m.id); return; }
+            // deps check
             if (!enabled) {
-              const deps = m.dependsOn || [];
-              const missing = deps.filter(d => {
+              const depsArr = m.dependsOn || [];
+              const missing = depsArr.filter(d => {
                 const dep = ModuleRegistry.get(d);
                 const depAllowed = licenseAllows(d) || dep?.priceModel === "free";
                 return !isEnabled(d) || !depAllowed;
               });
-              if (missing.length) {
-                alert("Kan ikke slå på. Mangler/er låst:\n\n" + missing.join("\n"));
-                return;
-              }
+              if (missing.length) { alert("Kan ikke slå på. Mangler/er låst:\n\n" + missing.join("\n")); return; }
             }
             await setEnabled(m.id, !enabled);
           });
 
-          const btnUnlock = document.createElement("button");
-          btnUnlock.className = "btn";
-          btnUnlock.textContent = allowed ? "Administrer" : "Lås opp";
-          btnUnlock.addEventListener("click", () => openLicenseModal(m.id));
+          row.querySelector('[data-act="shortcut"]').addEventListener("click", async () => {
+            await setModuleShortcut(m.id, !shortcutOn);
+          });
 
-          actions.appendChild(btnToggle);
-          actions.appendChild(btnUnlock);
-
-          right.appendChild(topBadges);
-          right.appendChild(actions);
-
-          row.appendChild(left);
-          row.appendChild(right);
           host.appendChild(row);
         }
       }
@@ -1637,21 +2208,17 @@
           .slice()
           .sort((a,b) => (a.order||999)-(b.order||999));
 
-        if (!enabledModules.length) {
-          const c = document.createElement("div");
-          c.className = "card";
-          c.innerHTML = `<h2>Ingen aktive moduler</h2><p class="muted">Gå til “Moduler” og skru på ønskede moduler.</p>`;
-          host.appendChild(c);
-          return;
-        }
-
         const api = {
           saveAndRefresh: async () => {
             await saveFarm();
             renderWork();
             renderKPIs();
+            renderDashboard();
+            renderPanelSetup();
+            renderModules();
           },
-          openEditor
+          openEditor,
+          actions: createActions()
         };
 
         for (const m of enabledModules) {
@@ -1667,7 +2234,6 @@
           const wrap = document.createElement("div");
           wrap.className = "card";
           const lic = licenseLabel(m.id);
-
           wrap.innerHTML = `
             <div style="display:flex; gap:10px; align-items:flex-start; justify-content:space-between">
               <div style="min-width:0">
@@ -1696,7 +2262,7 @@
       }
 
       // =========================
-      //  TEST RUNNER
+      //  TESTS
       // =========================
       function getTestCasesFor(moduleIdOrAll) {
         const list = [];
@@ -1710,34 +2276,32 @@
       function renderTestResults(results) {
         const host = $("#testResults");
         host.innerHTML = "";
-        for (const r of results) {
+        results.forEach(r => {
           const div = document.createElement("div");
-          div.className = "resultItem";
-          const badge = `<span class="badge ${r.ok ? "ok" : "fail"}">${r.ok ? "OK" : "FEIL"}</span>`;
+          div.className = "moduleRow";
           div.innerHTML = `
-            <div style="display:flex;gap:10px;align-items:center;justify-content:space-between">
-              <div style="font-weight:900; min-width:0">
-                <div>${escapeHtml(r.name)}</div>
-                <div class="small">Modul: ${escapeHtml(r.moduleId)}</div>
-              </div>
-              ${badge}
+            <div class="moduleMeta">
+              <div class="moduleTitle">${escapeHtml(r.name)}</div>
+              <div class="moduleDesc">Modul: ${escapeHtml(r.moduleId)}</div>
+              ${r.ok ? "" : `<div class="small">${escapeHtml(r.error || "")}</div>`}
             </div>
-            ${r.ok ? "" : `<div class="small">${escapeHtml(r.error)}</div>`}
+            <div class="moduleRight">
+              <span class="badge ${r.ok ? "ok":"fail"}">${r.ok ? "OK":"FEIL"}</span>
+            </div>
           `;
           host.appendChild(div);
-        }
+        });
       }
 
       function runTests(moduleIdOrAll) {
         const cases = getTestCasesFor(moduleIdOrAll);
         const results = [];
-        for (const t of cases) {
-          try { t.run(); results.push({ moduleId: t.moduleId, name: t.name, ok: true }); }
-          catch (e) { results.push({ moduleId: t.moduleId, name: t.name, ok: false, error: e?.message ?? String(e) }); }
-        }
+        cases.forEach(t => {
+          try { t.run(); results.push({ moduleId:t.moduleId, name:t.name, ok:true }); }
+          catch(e){ results.push({ moduleId:t.moduleId, name:t.name, ok:false, error: e?.message ?? String(e) }); }
+        });
         renderTestResults(results);
-        const okCount = results.filter(r => r.ok).length;
-        setStatus(`Tester: ${okCount}/${results.length} OK`);
+        setStatus(`Tester: ${results.filter(r=>r.ok).length}/${results.length} OK`);
       }
 
       function renderTestModuleSelect() {
@@ -1748,63 +2312,94 @@
         optAll.textContent = "Alle moduler";
         sel.appendChild(optAll);
 
-        const sorted = ModuleRegistry.list().slice().sort((a,b) => (a.order||999)-(b.order||999));
-        for (const m of sorted) {
+        ModuleRegistry.list().slice().sort((a,b)=>(a.order||999)-(b.order||999)).forEach(m => {
           const opt = document.createElement("option");
           opt.value = m.id;
           opt.textContent = `${m.title} (${m.id})`;
           sel.appendChild(opt);
-        }
+        });
       }
 
       // =========================
-      //  LOAD / INIT
+      //  INIT LOAD
       // =========================
       async function loadOrCreate() {
-        setStatus("Laster data…");
+        setStatus("Laster…");
 
-        const farm = await dbGet(FARM_KEY);
-        const lic = await dbGet(LICENSE_KEY);
-        const prefs = await dbGet(MODULE_PREFS_KEY);
+        state.farmData = await dbGet(FARM_KEY) || createNewFarm();
+        state.licenses = await dbGet(LICENSE_KEY) || defaultLicenses();
+        state.modulePrefs = await dbGet(MODULE_PREFS_KEY) || defaultModulePrefs();
 
-        state.farmData = farm || createNewFarm();
-        state.licenses = lic || defaultLicenses();
-        state.modulePrefs = prefs || defaultModulePrefs();
+        // Ensure base actions exist (needs farm data for job action title/subtitle)
+        registerBaseActions();
+
+        state.panelPrefs = normalizePanelPrefs(await dbGet(PANEL_PREFS_KEY) || defaultPanelPrefs());
 
         // Always enable core
         state.modulePrefs["farm.core"] = { enabled: true };
         state.modulePrefs["area.core"] = { enabled: true };
 
+        // Ensure default free modules ON
+        ["events.core","todo.core","shopping.core","timer.jobs"].forEach(id => state.modulePrefs[id] = { enabled:true });
+
         ensureDataPatched();
 
+        // Ensure module shortcut actions for any saved module shortcuts
+        for (const actionId of Object.keys(state.panelPrefs.visible || {})) {
+          if (actionId.startsWith("module.open:")) {
+            const moduleId = actionId.split("module.open:")[1];
+            if (moduleId) ensureModuleShortcutAction(moduleId);
+          }
+        }
+
         const v = validateCore(state.farmData);
-        setStatus(v.ok ? "Klar ✅" : "Datafeil: ta backup før vi fikser.");
+        setStatus(v.ok ? "Klar ✅" : "Datafeil – ta backup før vi fikser.");
 
         await dbSet(FARM_KEY, state.farmData);
         await dbSet(LICENSE_KEY, state.licenses);
         await dbSet(MODULE_PREFS_KEY, state.modulePrefs);
+        await dbSet(PANEL_PREFS_KEY, state.panelPrefs);
 
         syncFarmToForm();
-        renderModules();
-        renderTestModuleSelect();
-        renderWork();
         renderKPIs();
+        renderModules();
+        renderWork();
+        renderDashboard();
+        renderPanelSetup();
+        renderTestModuleSelect();
       }
 
       // =========================
-      //  UI WIRING
+      //  ROUTING BUTTONS
       // =========================
       function wireUI() {
         $$("#tabs .tab").forEach(b => b.addEventListener("click", () => routeTo(b.dataset.route)));
 
-        $("#btnCreateFarm").addEventListener("click", () => {
-          if (confirm("Dette nullstiller gården i appen. Ta backup først hvis du vil!\n\nFortsette?")) resetFarm();
+        $("#btnMinGard").addEventListener("click", () => routeTo("settings"));
+        $("#btnPanelSetup").addEventListener("click", () => routeTo("panelsetup"));
+
+        $("#btnSaveNow2").addEventListener("click", async () => {
+          await saveFarm();
+          renderKPIs(); renderDashboard(); renderWork(); renderModules(); renderPanelSetup();
         });
-        $("#btnSaveFarm").addEventListener("click", async () => { await saveFarm(); renderWork(); renderKPIs(); });
-        $("#btnSaveFarm2").addEventListener("click", async () => { await saveFarm(); renderWork(); renderKPIs(); });
+
+        $("#btnSaveFarmSettings").addEventListener("click", async () => {
+          await saveFarm();
+          syncFarmToForm();
+          renderKPIs(); renderDashboard(); renderWork(); renderModules(); renderPanelSetup();
+          setStatus("Lagret ✅");
+        });
 
         ["#farmName","#areaDyrket","#areaBeite","#areaUtmark"].forEach(id => {
-          $(id).addEventListener("change", async () => { await saveFarm(); renderWork(); renderKPIs(); });
+          $(id).addEventListener("change", async () => {
+            await saveFarm();
+            syncFarmToForm();
+            renderKPIs(); renderDashboard();
+          });
+        });
+
+        $("#btnResetFarm").addEventListener("click", () => {
+          if (confirm("Dette nullstiller gården i appen. Ta backup først hvis du vil!\n\nFortsette?")) resetFarm();
         });
 
         $("#btnExport").addEventListener("click", exportBackup);
@@ -1813,10 +2408,7 @@
         });
 
         $("#btnRunTestsAll").addEventListener("click", () => runTests("ALL"));
-        $("#btnRunTestsModule").addEventListener("click", () => {
-          const id = $("#testModuleSelect").value || "ALL";
-          runTests(id);
-        });
+        $("#btnRunTestsModule").addEventListener("click", () => runTests($("#testModuleSelect").value || "ALL"));
 
         $("#licenseOverlayBg").addEventListener("click", closeLicenseModal);
         $("#btnCancelLicense").addEventListener("click", closeLicenseModal);
@@ -1837,11 +2429,13 @@
           if (!state.editor.onSave || !state.editor.value) { closeEditor(); return; }
           await state.editor.onSave(state.editor.value);
           closeEditor();
+          // UI might change (job toggle title etc.)
+          renderDashboard();
+          renderPanelSetup();
         });
       }
 
-      (async function boot() {
-        setStatus("Starter…");
+      (async function boot(){
         wireUI();
         await loadOrCreate();
       })();
