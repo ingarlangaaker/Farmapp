@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#00bb55" />
+  <title>Gårdsapp</title>
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --card:#131a22;
+      --muted:#8aa0b5;
+      --text:#e8f0f7;
+      --line:#243242;
+      --accent:#0b5;
+      --danger:#d44;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:16px;
+      --pad:14px;
+      --max: 980px;
+      font-synthesis-weight: none;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 30% -10%, rgba(0,180,90,.25), transparent 60%), var(--bg);
+      color:var(--text);
+    }
+
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 12px 14px;
+      background: rgba(11,15,20,.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+    .brand{display:flex; gap:12px; align-items:center}
+    .dot{width:14px; height:14px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 6px rgba(0,180,90,.12)}
+    .title{font-weight:700; letter-spacing:.2px}
+    .subtitle{font-size:12px; color:var(--muted); margin-top:2px}
+
+    .container{max-width:var(--max); margin:0 auto; padding: 14px}
+    .tabs{
+      display:flex; gap:8px; overflow:auto; padding-bottom:10px;
+    }
+    .tab{
+      border:1px solid var(--line);
+      background:transparent; color:var(--text);
+      padding:10px 12px; border-radius:999px;
+      white-space:nowrap; font-weight:600;
+    }
+    .tab.active{border-color: rgba(0,180,90,.65); background: rgba(0,180,90,.12)}
+
+    .panel{padding: 6px 0 24px}
+    .hidden{display:none}
+    h1{font-size:22px; margin: 14px 2px}
+    h2{font-size:16px; margin: 0 0 10px}
+    h3{margin:0 0 10px}
+    .muted{color:var(--muted); line-height:1.4}
+    .hint{color:var(--muted); font-size:12px; line-height:1.35; margin-top:10px}
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: var(--pad);
+      box-shadow: var(--shadow);
+      margin: 12px 0;
+    }
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    .grid3{display:grid; grid-template-columns:1fr; gap:10px}
+    @media (min-width: 700px){
+      .grid3{grid-template-columns:1fr 1fr 1fr}
+    }
+    .kpi{padding:12px; border:1px solid var(--line); border-radius:14px; background: rgba(0,0,0,.12)}
+    .kpiLabel{font-size:12px; color:var(--muted)}
+    .kpiValue{font-size:18px; font-weight:750; margin-top:4px}
+
+    .field{display:flex; flex-direction:column; gap:6px}
+    .field span{font-size:12px; color:var(--muted)}
+    input, select, textarea{
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,.2);
+      color: var(--text);
+      font-size:16px;
+    }
+    input:focus, select:focus, textarea:focus{
+      outline:none; border-color: rgba(0,180,90,.7); box-shadow: 0 0 0 4px rgba(0,180,90,.12)
+    }
+    .btn{
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,180,90,.6);
+      background: rgba(0,180,90,.16);
+      color: var(--text);
+      font-weight: 700;
+    }
+    .btn.secondary{
+      border-color: rgba(138,160,181,.6);
+      background: rgba(138,160,181,.12);
+    }
+    .btn.danger{
+      border-color: rgba(212,68,68,.8);
+      background: rgba(212,68,68,.14);
+    }
+    .btn.ghost{
+      border-color: var(--line);
+      background: transparent;
+    }
+    .btn.full{width:100%; justify-content:center}
+
+    .list{margin:0; padding-left:18px; color:var(--text)}
+    .list li{margin:8px 0; color: var(--muted)}
+
+    .results{margin-top:12px}
+    .resultItem{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+      margin:10px 0;
+      background: rgba(0,0,0,.12);
+    }
+    .badge{
+      display:inline-block; padding:4px 10px; border-radius:999px;
+      font-size:12px; font-weight:800; letter-spacing:.2px;
+      border:1px solid var(--line);
+    }
+    .badge.ok{border-color: rgba(0,180,90,.6); background: rgba(0,180,90,.12)}
+    .badge.fail{border-color: rgba(212,68,68,.7); background: rgba(212,68,68,.12)}
+    .small{font-size:12px; color:var(--muted); line-height:1.35; margin-top:8px}
+
+    .drawer.hidden{display:none}
+    .drawer{
+      position:fixed; inset:0; z-index:50;
+    }
+    .drawerCard{
+      position:absolute; top:10px; right:10px; left:10px;
+      max-width: 520px;
+      margin-left:auto;
+      background: var(--card);
+      border:1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+    .drawerBackdrop{
+      position:absolute; inset:0;
+      background: rgba(0,0,0,.55);
+    }
+    hr{border:none; border-top:1px solid var(--line); margin:12px 0}
+    .note{
+      border:1px dashed rgba(138,160,181,.5);
+      background: rgba(138,160,181,.07);
+      padding: 10px 12px;
+      border-radius: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="dot"></div>
+      <div>
+        <div class="title">Gårdsapp</div>
+        <div class="subtitle" id="statusLine">Starter…</div>
+      </div>
+    </div>
+    <button class="btn ghost" id="btnMenu" aria-label="Meny">☰</button>
+  </header>
+
+  <main class="container">
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-route="dashboard">Oversikt</button>
+      <button class="tab" data-route="farm">Gård</button>
+      <button class="tab" data-route="backup">Backup</button>
+      <button class="tab" data-route="tests">Selvtest</button>
+      <button class="tab" data-route="modules">Moduler</button>
+    </nav>
+
+    <section class="panel" data-view="dashboard">
+      <h1>Oversikt</h1>
+      <p class="muted">
+        Dette er grunnmuren. Alt lagres lokalt på telefonen (IndexedDB) og kan sikkerhetskopieres til én fil.
+      </p>
+
+      <div class="note" style="margin: 10px 0 0">
+        Offline “installerbar app” (åpne uten nett etter at den er lukket) krever én ekstra fil senere (<code>sw.js</code>).
+        Men alt annet virker nå.
+      </div>
+
+      <div class="card">
+        <h2>Nøkkeltall</h2>
+        <div class="grid2">
+          <div class="kpi">
+            <div class="kpiLabel">Gårdsnavn</div>
+            <div class="kpiValue" id="kpiFarmName">—</div>
+          </div>
+          <div class="kpi">
+            <div class="kpiLabel">Sist lagret</div>
+            <div class="kpiValue" id="kpiUpdatedAt">—</div>
+          </div>
+          <div class="kpi">
+            <div class="kpiLabel">Areal dyrket (daa)</div>
+            <div class="kpiValue" id="kpiDyrket">—</div>
+          </div>
+          <div class="kpi">
+            <div class="kpiLabel">Areal beite (daa)</div>
+            <div class="kpiValue" id="kpiBeite">—</div>
+          </div>
+          <div class="kpi">
+            <div class="kpiLabel">Areal utmark (daa)</div>
+            <div class="kpiValue" id="kpiUtmark">—</div>
+          </div>
+          <div class="kpi">
+            <div class="kpiLabel">Versjon</div>
+            <div class="kpiValue" id="kpiVersion">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Hurtigvalg</h2>
+        <div class="row">
+          <button class="btn" id="btnCreateFarm">Opprett/Nullstill gård</button>
+          <button class="btn secondary" id="btnSaveFarm">Lagre nå</button>
+        </div>
+        <p class="hint">
+          “Opprett/Nullstill” lager en ny tom gård i databasen. Ta backup først hvis du vil være helt trygg.
+        </p>
+      </div>
+    </section>
+
+    <section class="panel hidden" data-view="farm">
+      <h1>Gård</h1>
+      <div class="card">
+        <h2>Grunninfo</h2>
+
+        <label class="field">
+          <span>Navn</span>
+          <input id="farmName" type="text" placeholder="F.eks. Karmøy gård" />
+        </label>
+
+        <div class="grid3">
+          <label class="field">
+            <span>Dyrket mark (daa)</span>
+            <input id="areaDyrket" type="number" inputmode="decimal" min="0" step="0.1" />
+          </label>
+          <label class="field">
+            <span>Beite (daa)</span>
+            <input id="areaBeite" type="number" inputmode="decimal" min="0" step="0.1" />
+          </label>
+          <label class="field">
+            <span>Utmark (daa)</span>
+            <input id="areaUtmark" type="number" inputmode="decimal" min="0" step="0.1" />
+          </label>
+        </div>
+
+        <div class="row">
+          <button class="btn" id="btnSaveFarm2">Lagre</button>
+        </div>
+        <p class="hint">Dette er minimumsfelter. Vi bygger resten modul for modul med test-fasit.</p>
+      </div>
+    </section>
+
+    <section class="panel hidden" data-view="backup">
+      <h1>Backup</h1>
+
+      <div class="card">
+        <h2>Eksporter</h2>
+        <p class="muted">Laster ned én JSON-fil med hele gården + metadata.</p>
+        <button class="btn" id="btnExport">Eksporter backup</button>
+      </div>
+
+      <div class="card">
+        <h2>Importer</h2>
+        <p class="muted">Importer overskriver gjeldende gård i databasen.</p>
+        <input id="importFile" type="file" accept="application/json" />
+        <button class="btn danger" id="btnImport">Importer backup</button>
+        <p class="hint">Tips: Ta eksport først, i tilfelle du vil angre.</p>
+      </div>
+    </section>
+
+    <section class="panel hidden" data-view="tests">
+      <h1>Selvtest</h1>
+
+      <div class="card">
+        <h2>Testpanel</h2>
+        <p class="muted">
+          Dette er “ingenting-virker”-sikringen. Når vi legger til beregninger, låser vi dem med fasit-tester.
+        </p>
+        <button class="btn" id="btnRunTests">Kjør alle tester</button>
+        <div id="testResults" class="results"></div>
+      </div>
+    </section>
+
+    <section class="panel hidden" data-view="modules">
+      <h1>Moduler</h1>
+      <div class="card">
+        <h2>Kommer (plugg-inn)</h2>
+        <ul class="list">
+          <li>Areal & skifter</li>
+          <li>Dyr (grupper, livsløp)</li>
+          <li>Beite (innmark/utmark)</li>
+          <li>Fôr (lager, kvalitet, svinn)</li>
+          <li>Tilskudd (regelpakker)</li>
+          <li>Økonomi (kontantstrøm)</li>
+          <li>Maskiner & vedlikehold</li>
+          <li>HMS & logg</li>
+        </ul>
+        <p class="hint">
+          Neste steg: vi legger inn første faktiske beregningsmodul (maks dyretall) og låser den med tester.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <div class="drawer hidden" id="drawer">
+    <div class="drawerCard">
+      <h3>Meny</h3>
+      <button class="btn ghost full" data-route="dashboard">Oversikt</button>
+      <button class="btn ghost full" data-route="farm">Gård</button>
+      <button class="btn ghost full" data-route="backup">Backup</button>
+      <button class="btn ghost full" data-route="tests">Selvtest</button>
+      <button class="btn ghost full" data-route="modules">Moduler</button>
+      <hr />
+      <button class="btn ghost full" id="btnCloseDrawer">Lukk</button>
+    </div>
+    <div class="drawerBackdrop" id="drawerBackdrop"></div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const APP_VERSION = "0.1.0";
+      const DB_NAME = "farmapp_db";
+      const DB_VERSION = 1;
+      const STORE = "documents";
+      const FARM_KEY = "currentFarm";
+
+      const $ = (q) => document.querySelector(q);
+      const $$ = (q) => [...document.querySelectorAll(q)];
+
+      let state = { farmData: null };
+
+      function setStatus(text) { $("#statusLine").textContent = text; }
+
+      function fmtDate(iso) {
+        if (!iso) return "—";
+        const d = new Date(iso);
+        return d.toLocaleString("no-NO", { dateStyle: "medium", timeStyle: "short" });
+      }
+
+      function num(v) {
+        const n = Number(v);
+        return Number.isFinite(n) ? n : 0;
+      }
+
+      function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, (c) => ({
+          "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
+        }[c]));
+      }
+
+      function createNewFarm() {
+        const now = new Date().toISOString();
+        return {
+          meta: {
+            schemaVersion: APP_VERSION,
+            createdAt: now,
+            updatedAt: now
+          },
+          farm: {
+            id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()),
+            name: "Min gård",
+            area: { dyrketDaa: 0, beiteDaa: 0, utmarkDaa: 0 },
+            livestock: {},
+            forage: {},
+            machines: {},
+            economy: {},
+            subsidies: {},
+            logs: []
+          }
+        };
+      }
+
+      function validateFarm(data) {
+        const errors = [];
+        if (!data || typeof data !== "object") errors.push("Data mangler.");
+        if (!data?.meta) errors.push("meta mangler.");
+        if (!data?.farm) errors.push("farm mangler.");
+        if (!data?.farm?.id) errors.push("farm.id mangler.");
+        if (typeof data?.farm?.name !== "string") errors.push("farm.name må være tekst.");
+
+        const a = data?.farm?.area;
+        if (!a) errors.push("farm.area mangler.");
+        for (const k of ["dyrketDaa","beiteDaa","utmarkDaa"]) {
+          const v = a?.[k];
+          if (typeof v !== "number" || Number.isNaN(v) || v < 0) errors.push(`farm.area.${k} må være et tall ≥ 0.`);
+        }
+        return { ok: errors.length === 0, errors };
+      }
+
+      function openDB() {
+        return new Promise((resolve, reject) => {
+          const req = indexedDB.open(DB_NAME, DB_VERSION);
+          req.onupgradeneeded = () => {
+            const db = req.result;
+            if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE);
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      }
+
+      async function dbGetFarm() {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE, "readonly");
+          const store = tx.objectStore(STORE);
+          const req = store.get(FARM_KEY);
+          req.onsuccess = () => { db.close(); resolve(req.result ?? null); };
+          req.onerror = () => { db.close(); reject(req.error); };
+        });
+      }
+
+      async function dbSetFarm(farmData) {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE, "readwrite");
+          const store = tx.objectStore(STORE);
+          store.put(farmData, FARM_KEY);
+          tx.oncomplete = () => { db.close(); resolve(); };
+          tx.onerror = () => { db.close(); reject(tx.error); };
+        });
+      }
+
+      async function dbClearAll() {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE, "readwrite");
+          const store = tx.objectStore(STORE);
+          store.clear();
+          tx.oncomplete = () => { db.close(); resolve(); };
+          tx.onerror = () => { db.close(); reject(tx.error); };
+        });
+      }
+
+      function routeTo(route) {
+        $$("#tabs .tab").forEach(b => b.classList.toggle("active", b.dataset.route === route));
+        $$("[data-view]").forEach(v => v.classList.toggle("hidden", v.dataset.view !== route));
+        closeDrawer();
+      }
+      function openDrawer(){ $("#drawer").classList.remove("hidden"); }
+      function closeDrawer(){ $("#drawer").classList.add("hidden"); }
+
+      function syncFarmToForm() {
+        const d = state.farmData;
+        if (!d) return;
+        $("#farmName").value = d.farm.name ?? "";
+        $("#areaDyrket").value = d.farm.area.dyrketDaa ?? 0;
+        $("#areaBeite").value = d.farm.area.beiteDaa ?? 0;
+        $("#areaUtmark").value = d.farm.area.utmarkDaa ?? 0;
+      }
+
+      function syncFormToFarm() {
+        const d = state.farmData;
+        if (!d) return;
+        d.farm.name = ($("#farmName").value || "").trim() || "Min gård";
+        d.farm.area.dyrketDaa = num($("#areaDyrket").value);
+        d.farm.area.beiteDaa  = num($("#areaBeite").value);
+        d.farm.area.utmarkDaa = num($("#areaUtmark").value);
+        d.meta.updatedAt = new Date().toISOString();
+      }
+
+      function renderKPIs() {
+        const d = state.farmData;
+        $("#kpiVersion").textContent = APP_VERSION;
+
+        if (!d) {
+          $("#kpiFarmName").textContent = "—";
+          $("#kpiUpdatedAt").textContent = "—";
+          $("#kpiDyrket").textContent = "—";
+          $("#kpiBeite").textContent = "—";
+          $("#kpiUtmark").textContent = "—";
+          return;
+        }
+        $("#kpiFarmName").textContent = d.farm.name ?? "—";
+        $("#kpiUpdatedAt").textContent = fmtDate(d.meta.updatedAt);
+        $("#kpiDyrket").textContent = String(d.farm.area.dyrketDaa ?? 0);
+        $("#kpiBeite").textContent = String(d.farm.area.beiteDaa ?? 0);
+        $("#kpiUtmark").textContent = String(d.farm.area.utmarkDaa ?? 0);
+      }
+
+      async function loadOrCreate() {
+        setStatus("Laster data…");
+        const saved = await dbGetFarm();
+        if (saved) {
+          state.farmData = saved;
+          const v = validateFarm(saved);
+          setStatus(v.ok ? "Klar ✅" : "Datafeil: ta backup før vi fikser.");
+        } else {
+          state.farmData = createNewFarm();
+          await dbSetFarm(state.farmData);
+          setStatus("Klar (ny gård opprettet) ✅");
+        }
+        syncFarmToForm();
+        renderKPIs();
+      }
+
+      async function saveFarm() {
+        if (!state.farmData) return;
+        syncFormToFarm();
+
+        const v = validateFarm(state.farmData);
+        if (!v.ok) {
+          alert("Kan ikke lagre:\n\n" + v.errors.join("\n"));
+          return;
+        }
+        await dbSetFarm(state.farmData);
+        renderKPIs();
+        setStatus("Lagret ✅");
+      }
+
+      async function resetFarm() {
+        await dbClearAll();
+        state.farmData = createNewFarm();
+        await dbSetFarm(state.farmData);
+        syncFarmToForm();
+        renderKPIs();
+        setStatus("Ny gård opprettet ✅");
+      }
+
+      function downloadJSON(filename, obj) {
+        const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      async function exportBackup() {
+        if (!state.farmData) return;
+        const payload = { exportedAt: new Date().toISOString(), appVersion: APP_VERSION, data: state.farmData };
+        const safeName = (state.farmData.farm.name || "farm").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+        downloadJSON(`${safeName}-backup.json`, payload);
+        setStatus("Backup eksportert ✅");
+      }
+
+      async function importBackup() {
+        const input = $("#importFile");
+        const file = input.files?.[0];
+        if (!file) { alert("Velg en backup-fil først."); return; }
+
+        const text = await file.text();
+        let parsed;
+        try { parsed = JSON.parse(text); } catch { alert("Ugyldig JSON-fil."); return; }
+
+        const data = parsed?.data ?? parsed;
+        const v = validateFarm(data);
+        if (!v.ok) { alert("Import stoppet:\n\n" + v.errors.join("\n")); return; }
+
+        state.farmData = data;
+        state.farmData.meta.updatedAt = new Date().toISOString();
+        await dbSetFarm(state.farmData);
+        syncFarmToForm();
+        renderKPIs();
+        setStatus("Importert ✅");
+        input.value = "";
+      }
+
+      function getTestCases() {
+        function assert(cond, msg) { if (!cond) throw new Error(msg); }
+        return [
+          {
+            name: "Ny gård validerer",
+            run: () => {
+              const d = createNewFarm();
+              const v = validateFarm(d);
+              assert(v.ok, "Ny gård feilet validering: " + v.errors.join(" | "));
+            }
+          },
+          {
+            name: "Areal kan ikke være negativt",
+            run: () => {
+              const d = createNewFarm();
+              d.farm.area.utmarkDaa = -1;
+              const v = validateFarm(d);
+              assert(!v.ok, "Validering skulle feile ved negativ utmark.");
+            }
+          }
+        ];
+      }
+
+      function renderTestResults(results) {
+        const host = $("#testResults");
+        host.innerHTML = "";
+        for (const r of results) {
+          const div = document.createElement("div");
+          div.className = "resultItem";
+          const badge = `<span class="badge ${r.ok ? "ok" : "fail"}">${r.ok ? "OK" : "FEIL"}</span>`;
+          div.innerHTML = `
+            <div style="display:flex;gap:10px;align-items:center;justify-content:space-between">
+              <div style="font-weight:800">${escapeHtml(r.name)}</div>
+              ${badge}
+            </div>
+            ${r.ok ? "" : `<div class="small">${escapeHtml(r.error)}</div>`}
+          `;
+          host.appendChild(div);
+        }
+      }
+
+      function runAllTests() {
+        const cases = getTestCases();
+        const results = [];
+        for (const t of cases) {
+          try { t.run(); results.push({ name: t.name, ok: true }); }
+          catch (e) { results.push({ name: t.name, ok: false, error: e?.message ?? String(e) }); }
+        }
+        renderTestResults(results);
+        const okCount = results.filter(r => r.ok).length;
+        setStatus(`Tester: ${okCount}/${results.length} OK`);
+      }
+
+      function wireUI() {
+        $$("#tabs .tab").forEach(b => b.addEventListener("click", () => routeTo(b.dataset.route)));
+
+        $("#btnMenu").addEventListener("click", openDrawer);
+        $("#btnCloseDrawer").addEventListener("click", closeDrawer);
+        $("#drawerBackdrop").addEventListener("click", closeDrawer);
+        $$("#drawer [data-route]").forEach(b => b.addEventListener("click", () => routeTo(b.dataset.route)));
+
+        $("#btnCreateFarm").addEventListener("click", () => {
+          if (confirm("Dette nullstiller gården i appen. Ta backup først hvis du vil!\n\nFortsette?")) resetFarm();
+        });
+        $("#btnSaveFarm").addEventListener("click", saveFarm);
+        $("#btnSaveFarm2").addEventListener("click", saveFarm);
+
+        ["#farmName","#areaDyrket","#areaBeite","#areaUtmark"].forEach(id => {
+          $(id).addEventListener("change", () => saveFarm());
+        });
+
+        $("#btnExport").addEventListener("click", exportBackup);
+        $("#btnImport").addEventListener("click", () => {
+          if (confirm("Import overskriver gjeldende gård i appen.\n\nFortsette?")) importBackup();
+        });
+
+        $("#btnRunTests").addEventListener("click", runAllTests);
+      }
+
+      (async function boot() {
+        setStatus("Starter…");
+        wireUI();
+        await loadOrCreate();
+      })();
+    })();
+  </script>
+</body>
+</html>
