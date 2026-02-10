@@ -14,6 +14,7 @@
       --line:#243242;
       --accent:#0b5;
       --danger:#d44;
+      --warn:#e0b400;
       --shadow: 0 10px 30px rgba(0,0,0,.35);
       --radius:16px;
       --pad:14px;
@@ -92,6 +93,7 @@
     input:focus, select:focus, textarea:focus{
       outline:none; border-color: rgba(0,180,90,.7); box-shadow: 0 0 0 4px rgba(0,180,90,.12)
     }
+
     .btn{
       padding: 11px 14px;
       border-radius: 12px;
@@ -114,9 +116,6 @@
     }
     .btn.full{width:100%; justify-content:center}
 
-    .list{margin:0; padding-left:18px; color:var(--text)}
-    .list li{margin:8px 0; color: var(--muted)}
-
     .results{margin-top:12px}
     .resultItem{
       border:1px solid var(--line);
@@ -125,13 +124,20 @@
       margin:10px 0;
       background: rgba(0,0,0,.12);
     }
+
     .badge{
-      display:inline-block; padding:4px 10px; border-radius:999px;
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 10px; border-radius:999px;
       font-size:12px; font-weight:800; letter-spacing:.2px;
       border:1px solid var(--line);
+      white-space:nowrap;
     }
     .badge.ok{border-color: rgba(0,180,90,.6); background: rgba(0,180,90,.12)}
     .badge.fail{border-color: rgba(212,68,68,.7); background: rgba(212,68,68,.12)}
+    .badge.locked{border-color: rgba(224,180,0,.6); background: rgba(224,180,0,.12)}
+    .badge.free{border-color: rgba(138,160,181,.6); background: rgba(138,160,181,.10)}
+    .badge.on{border-color: rgba(0,180,90,.6); background: rgba(0,180,90,.10)}
+    .badge.off{border-color: rgba(138,160,181,.6); background: rgba(138,160,181,.08)}
     .small{font-size:12px; color:var(--muted); line-height:1.35; margin-top:8px}
 
     .drawer.hidden{display:none}
@@ -153,6 +159,7 @@
       background: rgba(0,0,0,.55);
     }
     hr{border:none; border-top:1px solid var(--line); margin:12px 0}
+
     .note{
       border:1px dashed rgba(138,160,181,.5);
       background: rgba(138,160,181,.07);
@@ -161,6 +168,38 @@
       color: var(--muted);
       font-size: 12px;
       line-height: 1.35;
+    }
+
+    .moduleRow{
+      display:flex; gap:10px; align-items:flex-start; justify-content:space-between;
+      padding:12px; border:1px solid var(--line); border-radius:14px;
+      background: rgba(0,0,0,.12);
+      margin:10px 0;
+    }
+    .moduleMeta{min-width:0}
+    .moduleTitle{font-weight:900}
+    .moduleDesc{color:var(--muted); font-size:12px; line-height:1.35; margin-top:4px}
+    .moduleRight{display:flex; flex-direction:column; gap:8px; align-items:flex-end}
+    .moduleActions{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+    .pill{
+      display:inline-flex; gap:6px; align-items:center;
+      padding:4px 10px; border-radius:999px;
+      font-size:12px; font-weight:800;
+      border:1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .overlay.hidden{display:none}
+    .overlay{position:fixed; inset:0; z-index:80}
+    .overlayBg{position:absolute; inset:0; background: rgba(0,0,0,.62)}
+    .modal{
+      position:absolute; left:10px; right:10px; top:10px;
+      max-width:560px; margin:0 auto;
+      background: var(--card);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      box-shadow: var(--shadow);
     }
   </style>
 </head>
@@ -188,12 +227,11 @@
     <section class="panel" data-view="dashboard">
       <h1>Oversikt</h1>
       <p class="muted">
-        Dette er grunnmuren. Alt lagres lokalt på telefonen (IndexedDB) og kan sikkerhetskopieres til én fil.
+        Dette er betalbar, modulbasert grunnmur. Kjerne er gratis, andre moduler kan låses opp per modul senere.
       </p>
 
       <div class="note" style="margin: 10px 0 0">
-        Offline “installerbar app” (åpne uten nett etter at den er lukket) krever én ekstra fil senere (<code>sw.js</code>).
-        Men alt annet virker nå.
+        Dette oppsettet er laget for salg per modul senere: hver modul har eget datafelt, validering, beregning, UI og tester.
       </div>
 
       <div class="card">
@@ -240,12 +278,13 @@
 
     <section class="panel hidden" data-view="farm">
       <h1>Gård</h1>
+
       <div class="card">
-        <h2>Grunninfo</h2>
+        <h2>Grunninfo (gratis kjerne)</h2>
 
         <label class="field">
           <span>Navn</span>
-          <input id="farmName" type="text" placeholder="F.eks. Karmøy gård" />
+          <input id="farmName" type="text" placeholder="F.eks. Min gård" />
         </label>
 
         <div class="grid3">
@@ -266,7 +305,14 @@
         <div class="row">
           <button class="btn" id="btnSaveFarm2">Lagre</button>
         </div>
-        <p class="hint">Dette er minimumsfelter. Vi bygger resten modul for modul med test-fasit.</p>
+        <p class="hint">Foreløpig: minimum. Resten kommer som moduler du kan selge per modul.</p>
+      </div>
+
+      <div class="card">
+        <h2>Produksjon (kommer)</h2>
+        <p class="muted">
+          Produksjonsprofiler (korn, melk, grønt osv.) kommer som egen modul. Appen er bygget produksjonsnøytralt.
+        </p>
       </div>
     </section>
 
@@ -275,7 +321,7 @@
 
       <div class="card">
         <h2>Eksporter</h2>
-        <p class="muted">Laster ned én JSON-fil med hele gården + metadata.</p>
+        <p class="muted">Laster ned én JSON-fil med hele gården + metadata (inkl. modul-status).</p>
         <button class="btn" id="btnExport">Eksporter backup</button>
       </div>
 
@@ -294,30 +340,39 @@
       <div class="card">
         <h2>Testpanel</h2>
         <p class="muted">
-          Dette er “ingenting-virker”-sikringen. Når vi legger til beregninger, låser vi dem med fasit-tester.
+          Testene er låsingen som hindrer “ingenting virker”. Du kan kjøre alle tester eller per modul.
         </p>
-        <button class="btn" id="btnRunTests">Kjør alle tester</button>
+
+        <label class="field" style="margin-top:10px">
+          <span>Velg modul</span>
+          <select id="testModuleSelect"></select>
+        </label>
+
+        <div class="row" style="margin-top:10px">
+          <button class="btn" id="btnRunTestsAll">Kjør alle tester</button>
+          <button class="btn secondary" id="btnRunTestsModule">Kjør valgte modul</button>
+        </div>
+
         <div id="testResults" class="results"></div>
       </div>
     </section>
 
     <section class="panel hidden" data-view="modules">
       <h1>Moduler</h1>
+
       <div class="card">
-        <h2>Kommer (plugg-inn)</h2>
-        <ul class="list">
-          <li>Areal & skifter</li>
-          <li>Dyr (grupper, livsløp)</li>
-          <li>Beite (innmark/utmark)</li>
-          <li>Fôr (lager, kvalitet, svinn)</li>
-          <li>Tilskudd (regelpakker)</li>
-          <li>Økonomi (kontantstrøm)</li>
-          <li>Maskiner & vedlikehold</li>
-          <li>HMS & logg</li>
-        </ul>
-        <p class="hint">
-          Neste steg: vi legger inn første faktiske beregningsmodul (maks dyretall) og låser den med tester.
+        <h2>Modulbutikk (klar for betaling senere)</h2>
+        <p class="muted">
+          Gratis-moduler er tilgjengelige. Betalte moduler vises som “Låst” og kan låses opp per modul.
         </p>
+        <div class="note" style="margin-top:10px">
+          Akkurat nå er “opplåsing” en demo-mekanisme (uten betaling). Når du er klar, bytter vi dette til ekte betaling/abonnement.
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Mine moduler</h2>
+        <div id="modulesList"></div>
       </div>
     </section>
   </main>
@@ -336,20 +391,52 @@
     <div class="drawerBackdrop" id="drawerBackdrop"></div>
   </div>
 
+  <div class="overlay hidden" id="licenseOverlay">
+    <div class="overlayBg" id="licenseOverlayBg"></div>
+    <div class="modal">
+      <h3>Lås opp modul</h3>
+      <p class="muted" id="licenseModalText">—</p>
+
+      <label class="field" style="margin-top:10px">
+        <span>Aktiveringskode</span>
+        <input id="licenseCodeInput" type="text" placeholder="f.eks. DEMO-..." />
+      </label>
+
+      <div class="row" style="margin-top:12px">
+        <button class="btn" id="btnApplyLicense">Aktiver</button>
+        <button class="btn ghost" id="btnCancelLicense">Avbryt</button>
+      </div>
+
+      <p class="hint">
+        Demo i denne fasen: Du kan bruke kode <b>DEMO-OPEN</b> for å simulere opplåsing (senere byttes dette til ekte betaling).
+      </p>
+    </div>
+  </div>
+
   <script>
     (function () {
       "use strict";
 
-      const APP_VERSION = "0.1.0";
+      // =========================
+      //  APP / DB BASICS
+      // =========================
+      const APP_VERSION = "0.2.0";
       const DB_NAME = "farmapp_db";
-      const DB_VERSION = 1;
+      const DB_VERSION = 2; // bump for license store
       const STORE = "documents";
       const FARM_KEY = "currentFarm";
+      const LICENSE_KEY = "licenses";
+      const MODULE_PREFS_KEY = "modulePrefs";
 
       const $ = (q) => document.querySelector(q);
       const $$ = (q) => [...document.querySelectorAll(q)];
 
-      let state = { farmData: null };
+      let state = {
+        farmData: null,
+        licenses: null,
+        modulePrefs: null,
+        licenseModalTarget: null
+      };
 
       function setStatus(text) { $("#statusLine").textContent = text; }
 
@@ -370,44 +457,7 @@
         }[c]));
       }
 
-      function createNewFarm() {
-        const now = new Date().toISOString();
-        return {
-          meta: {
-            schemaVersion: APP_VERSION,
-            createdAt: now,
-            updatedAt: now
-          },
-          farm: {
-            id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()),
-            name: "Min gård",
-            area: { dyrketDaa: 0, beiteDaa: 0, utmarkDaa: 0 },
-            livestock: {},
-            forage: {},
-            machines: {},
-            economy: {},
-            subsidies: {},
-            logs: []
-          }
-        };
-      }
-
-      function validateFarm(data) {
-        const errors = [];
-        if (!data || typeof data !== "object") errors.push("Data mangler.");
-        if (!data?.meta) errors.push("meta mangler.");
-        if (!data?.farm) errors.push("farm mangler.");
-        if (!data?.farm?.id) errors.push("farm.id mangler.");
-        if (typeof data?.farm?.name !== "string") errors.push("farm.name må være tekst.");
-
-        const a = data?.farm?.area;
-        if (!a) errors.push("farm.area mangler.");
-        for (const k of ["dyrketDaa","beiteDaa","utmarkDaa"]) {
-          const v = a?.[k];
-          if (typeof v !== "number" || Number.isNaN(v) || v < 0) errors.push(`farm.area.${k} må være et tall ≥ 0.`);
-        }
-        return { ok: errors.length === 0, errors };
-      }
+      function nowIso(){ return new Date().toISOString(); }
 
       function openDB() {
         return new Promise((resolve, reject) => {
@@ -421,23 +471,23 @@
         });
       }
 
-      async function dbGetFarm() {
+      async function dbGet(key) {
         const db = await openDB();
         return new Promise((resolve, reject) => {
           const tx = db.transaction(STORE, "readonly");
           const store = tx.objectStore(STORE);
-          const req = store.get(FARM_KEY);
+          const req = store.get(key);
           req.onsuccess = () => { db.close(); resolve(req.result ?? null); };
           req.onerror = () => { db.close(); reject(req.error); };
         });
       }
 
-      async function dbSetFarm(farmData) {
+      async function dbSet(key, value) {
         const db = await openDB();
         return new Promise((resolve, reject) => {
           const tx = db.transaction(STORE, "readwrite");
           const store = tx.objectStore(STORE);
-          store.put(farmData, FARM_KEY);
+          store.put(value, key);
           tx.oncomplete = () => { db.close(); resolve(); };
           tx.onerror = () => { db.close(); reject(tx.error); };
         });
@@ -447,13 +497,306 @@
         const db = await openDB();
         return new Promise((resolve, reject) => {
           const tx = db.transaction(STORE, "readwrite");
-          const store = tx.objectStore(STORE);
-          store.clear();
+          tx.objectStore(STORE).clear();
           tx.oncomplete = () => { db.close(); resolve(); };
           tx.onerror = () => { db.close(); reject(tx.error); };
         });
       }
 
+      // =========================
+      //  DATA MODEL (CORE)
+      // =========================
+      function createNewFarm() {
+        const now = nowIso();
+        return {
+          meta: {
+            schemaVersion: APP_VERSION,
+            createdAt: now,
+            updatedAt: now
+          },
+          farm: {
+            id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()),
+            name: "Min gård",
+            area: { dyrketDaa: 0, beiteDaa: 0, utmarkDaa: 0 },
+
+            // Modulområder (produksjonsnøytralt)
+            modules: {
+              // senere: areaUnits, productions, livestock, crops, forage, economy, subsidies, logs...
+            }
+          }
+        };
+      }
+
+      function validateCore(data) {
+        const errors = [];
+        if (!data || typeof data !== "object") errors.push("Data mangler.");
+        if (!data?.meta) errors.push("meta mangler.");
+        if (!data?.farm) errors.push("farm mangler.");
+        if (!data?.farm?.id) errors.push("farm.id mangler.");
+        if (typeof data?.farm?.name !== "string") errors.push("farm.name må være tekst.");
+
+        const a = data?.farm?.area;
+        if (!a) errors.push("farm.area mangler.");
+        for (const k of ["dyrketDaa","beiteDaa","utmarkDaa"]) {
+          const v = a?.[k];
+          if (typeof v !== "number" || Number.isNaN(v) || v < 0) errors.push(`farm.area.${k} må være et tall ≥ 0.`);
+        }
+        if (!data?.farm?.modules || typeof data.farm.modules !== "object") errors.push("farm.modules må finnes (objekt).");
+        return { ok: errors.length === 0, errors };
+      }
+
+      // =========================
+      //  LICENSE + MODULE PREFS
+      // =========================
+      // licenses[moduleId] = { status: "free"|"unlocked"|"trial"|"expired"|"locked", updatedAt, trialEndsAt? }
+      function defaultLicenses() {
+        const out = {};
+        for (const m of ModuleRegistry.list()) {
+          if (m.priceModel === "free") out[m.id] = { status: "free", updatedAt: nowIso() };
+          else out[m.id] = { status: "locked", updatedAt: nowIso() };
+        }
+        return out;
+      }
+
+      // modulePrefs[moduleId] = { enabled: boolean }
+      function defaultModulePrefs() {
+        const out = {};
+        for (const m of ModuleRegistry.list()) {
+          out[m.id] = { enabled: m.defaultEnabled === true };
+        }
+        return out;
+      }
+
+      function licenseAllows(moduleId) {
+        const lic = state.licenses?.[moduleId];
+        if (!lic) return false;
+        if (lic.status === "free" || lic.status === "unlocked") return true;
+        if (lic.status === "trial") {
+          const end = lic.trialEndsAt ? new Date(lic.trialEndsAt).getTime() : 0;
+          return Date.now() <= end;
+        }
+        return false;
+      }
+
+      function licenseLabel(moduleId) {
+        const lic = state.licenses?.[moduleId];
+        if (!lic) return { cls: "locked", text: "Låst" };
+        if (lic.status === "free") return { cls: "free", text: "Gratis" };
+        if (lic.status === "unlocked") return { cls: "ok", text: "Låst opp" };
+        if (lic.status === "trial") {
+          const end = lic.trialEndsAt ? fmtDate(lic.trialEndsAt) : "—";
+          return { cls: "locked", text: "Prøve: " + end };
+        }
+        return { cls: "locked", text: "Låst" };
+      }
+
+      function isEnabled(moduleId) {
+        const p = state.modulePrefs?.[moduleId];
+        return p ? !!p.enabled : false;
+      }
+
+      async function setEnabled(moduleId, enabled) {
+        if (!state.modulePrefs) state.modulePrefs = defaultModulePrefs();
+        state.modulePrefs[moduleId] = { enabled: !!enabled };
+        await dbSet(MODULE_PREFS_KEY, state.modulePrefs);
+        renderModules();
+        renderTestModuleSelect();
+      }
+
+      // Demo activation: code DEMO-OPEN unlocks module (placeholder for real payments)
+      async function applyActivationCode(moduleId, code) {
+        const c = (code || "").trim();
+        if (!c) return { ok:false, msg:"Skriv inn en kode." };
+
+        // DEMO: unlock anything with DEMO-OPEN
+        if (c === "DEMO-OPEN") {
+          state.licenses[moduleId] = { status: "unlocked", updatedAt: nowIso() };
+          await dbSet(LICENSE_KEY, state.licenses);
+          return { ok:true, msg:"Modul låst opp (demo)." };
+        }
+
+        return { ok:false, msg:"Ugyldig kode." };
+      }
+
+      // =========================
+      //  MODULE REGISTRY (SELLABLE)
+      // =========================
+      // Contract: id, title, description, priceModel, defaultEnabled, dependsOn[], dataPatch(farmData),
+      // validate(farmData), calc(farmData), ui (optional), tests[]
+      const ModuleRegistry = (function(){
+        const modules = [];
+
+        function add(m){ modules.push(m); return m; }
+        function list(){ return modules.slice(); }
+        function get(id){ return modules.find(x => x.id === id) || null; }
+
+        return { add, list, get };
+      })();
+
+      // ---- Core modules (free) ----
+      ModuleRegistry.add({
+        id: "farm.core",
+        title: "Kjerne: Gård",
+        description: "Grunnmodell, lagring og basisfelt som navn/areal.",
+        priceModel: "free",
+        defaultEnabled: true,
+        dependsOn: [],
+        dataPatch: (d) => {
+          if (!d.farm.modules) d.farm.modules = {};
+          if (!d.farm.modules.core) d.farm.modules.core = { notes: "" };
+        },
+        validate: (d) => validateCore(d),
+        calc: (d) => ({ ok: true }),
+        tests: [
+          {
+            name: "farm.core: Ny gård validerer",
+            run: () => {
+              const d = createNewFarm();
+              const v = validateCore(d);
+              if (!v.ok) throw new Error(v.errors.join(" | "));
+            }
+          },
+          {
+            name: "farm.core: Areal kan ikke være negativt",
+            run: () => {
+              const d = createNewFarm();
+              d.farm.area.utmarkDaa = -1;
+              const v = validateCore(d);
+              if (v.ok) throw new Error("Skulle feile ved negativ utmark.");
+            }
+          }
+        ]
+      });
+
+      ModuleRegistry.add({
+        id: "area.core",
+        title: "Kjerne: Areal",
+        description: "Areal som grunnkapasitet. Skifter/arealenheter kommer som oppgradering.",
+        priceModel: "free",
+        defaultEnabled: true,
+        dependsOn: ["farm.core"],
+        dataPatch: (d) => {
+          if (!d.farm.modules.area) d.farm.modules.area = { units: [] }; // senere: skifter/beiteområde
+        },
+        validate: (d) => ({ ok: true, errors: [] }),
+        calc: (d) => {
+          const a = d.farm.area;
+          const total = (a.dyrketDaa||0) + (a.beiteDaa||0) + (a.utmarkDaa||0);
+          return { totalDaa: total };
+        },
+        tests: [
+          {
+            name: "area.core: totalDaa beregnes",
+            run: () => {
+              const d = createNewFarm();
+              d.farm.area = { dyrketDaa: 10, beiteDaa: 2, utmarkDaa: 3 };
+              const r = ModuleRegistry.get("area.core").calc(d);
+              if (r.totalDaa !== 15) throw new Error("Forventet totalDaa = 15");
+            }
+          }
+        ]
+      });
+
+      ModuleRegistry.add({
+        id: "resources.core",
+        title: "Kjerne: Ressurser",
+        description: "Maskiner, bygg, energi og arbeidskapasitet (grunnstruktur).",
+        priceModel: "free",
+        defaultEnabled: false,
+        dependsOn: ["farm.core"],
+        dataPatch: (d) => {
+          if (!d.farm.modules.resources) d.farm.modules.resources = {
+            labor: { hoursPerWeek: 0 },
+            machines: [],
+            buildings: []
+          };
+        },
+        validate: (d) => ({ ok: true, errors: [] }),
+        calc: (d) => ({ ok: true }),
+        tests: [
+          {
+            name: "resources.core: dataPatch lager struktur",
+            run: () => {
+              const d = createNewFarm();
+              ModuleRegistry.get("resources.core").dataPatch(d);
+              if (!d.farm.modules.resources || !d.farm.modules.resources.labor) throw new Error("Mangler resources.labor");
+            }
+          }
+        ]
+      });
+
+      // ---- Paid modules (locked for now) ----
+      ModuleRegistry.add({
+        id: "productions.core",
+        title: "Produksjonsprofiler",
+        description: "Aktiver korn/melk/grønt osv. Styrer hvilke felter og KPI-er som vises.",
+        priceModel: "paid",
+        defaultEnabled: false,
+        dependsOn: ["farm.core"],
+        dataPatch: (d) => {
+          if (!d.farm.modules.productions) d.farm.modules.productions = { active: [], settings: {} };
+        },
+        validate: (d) => ({ ok: true, errors: [] }),
+        calc: (d) => ({ active: d.farm.modules.productions?.active || [] }),
+        tests: [
+          { name: "productions.core: placeholder test", run: () => {} }
+        ]
+      });
+
+      ModuleRegistry.add({
+        id: "economy.basic",
+        title: "Økonomi: Grunn",
+        description: "Inntekter/kostnader, dekningsbidrag og enkel kontantstrøm.",
+        priceModel: "paid",
+        defaultEnabled: false,
+        dependsOn: ["farm.core","resources.core"],
+        dataPatch: (d) => {
+          if (!d.farm.modules.economy) d.farm.modules.economy = { lines: [], monthly: [] };
+        },
+        validate: (d) => ({ ok: true, errors: [] }),
+        calc: (d) => ({ ok: true }),
+        tests: [
+          { name: "economy.basic: placeholder test", run: () => {} }
+        ]
+      });
+
+      ModuleRegistry.add({
+        id: "rules.packages",
+        title: "Regelpakker",
+        description: "Tilskudd/krav/miljøregler som kan byttes per land/år uten å endre appen.",
+        priceModel: "paid",
+        defaultEnabled: false,
+        dependsOn: ["farm.core","productions.core"],
+        dataPatch: (d) => {
+          if (!d.farm.modules.rules) d.farm.modules.rules = { packages: [], activePackageId: null };
+        },
+        validate: (d) => ({ ok: true, errors: [] }),
+        calc: (d) => ({ ok: true }),
+        tests: [
+          { name: "rules.packages: placeholder test", run: () => {} }
+        ]
+      });
+
+      ModuleRegistry.add({
+        id: "optimization.pro",
+        title: "Optimalisering: Pro",
+        description: "Maksimer tilskudd/DB/kroner-time under begrensninger (areal, fôr, arbeid, regler).",
+        priceModel: "subscription",
+        defaultEnabled: false,
+        dependsOn: ["farm.core","area.core","productions.core","rules.packages"],
+        dataPatch: (d) => {
+          if (!d.farm.modules.optimization) d.farm.modules.optimization = { lastRun: null, results: null };
+        },
+        validate: (d) => ({ ok: true, errors: [] }),
+        calc: (d) => ({ ok: true }),
+        tests: [
+          { name: "optimization.pro: placeholder test", run: () => {} }
+        ]
+      });
+
+      // =========================
+      //  ROUTING / UI
+      // =========================
       function routeTo(route) {
         $$("#tabs .tab").forEach(b => b.classList.toggle("active", b.dataset.route === route));
         $$("[data-view]").forEach(v => v.classList.toggle("hidden", v.dataset.view !== route));
@@ -461,6 +804,22 @@
       }
       function openDrawer(){ $("#drawer").classList.remove("hidden"); }
       function closeDrawer(){ $("#drawer").classList.add("hidden"); }
+
+      function openLicenseModal(moduleId) {
+        state.licenseModalTarget = moduleId;
+        const m = ModuleRegistry.get(moduleId);
+        const label = licenseLabel(moduleId);
+        $("#licenseModalText").innerHTML = `
+          <div><b>${escapeHtml(m.title)}</b></div>
+          <div class="small">Status: <span class="badge ${label.cls}">${escapeHtml(label.text)}</span></div>
+        `;
+        $("#licenseCodeInput").value = "";
+        $("#licenseOverlay").classList.remove("hidden");
+      }
+      function closeLicenseModal() {
+        state.licenseModalTarget = null;
+        $("#licenseOverlay").classList.add("hidden");
+      }
 
       function syncFarmToForm() {
         const d = state.farmData;
@@ -478,7 +837,7 @@
         d.farm.area.dyrketDaa = num($("#areaDyrket").value);
         d.farm.area.beiteDaa  = num($("#areaBeite").value);
         d.farm.area.utmarkDaa = num($("#areaUtmark").value);
-        d.meta.updatedAt = new Date().toISOString();
+        d.meta.updatedAt = nowIso();
       }
 
       function renderKPIs() {
@@ -500,42 +859,72 @@
         $("#kpiUtmark").textContent = String(d.farm.area.utmarkDaa ?? 0);
       }
 
-      async function loadOrCreate() {
-        setStatus("Laster data…");
-        const saved = await dbGetFarm();
-        if (saved) {
-          state.farmData = saved;
-          const v = validateFarm(saved);
-          setStatus(v.ok ? "Klar ✅" : "Datafeil: ta backup før vi fikser.");
-        } else {
-          state.farmData = createNewFarm();
-          await dbSetFarm(state.farmData);
-          setStatus("Klar (ny gård opprettet) ✅");
+      function ensureDataPatched() {
+        // Apply dataPatch for all enabled + licensed modules (and always for free enabled)
+        const d = state.farmData;
+        if (!d) return;
+
+        for (const m of ModuleRegistry.list()) {
+          const enabled = isEnabled(m.id);
+          const allowed = licenseAllows(m.id) || m.priceModel === "free";
+          if (enabled && allowed && typeof m.dataPatch === "function") {
+            m.dataPatch(d);
+          }
         }
-        syncFarmToForm();
-        renderKPIs();
       }
 
+      // =========================
+      //  SAVE / RESET / BACKUP
+      // =========================
       async function saveFarm() {
         if (!state.farmData) return;
         syncFormToFarm();
 
-        const v = validateFarm(state.farmData);
-        if (!v.ok) {
-          alert("Kan ikke lagre:\n\n" + v.errors.join("\n"));
+        // Always patch enabled licensed modules before validate/save
+        ensureDataPatched();
+
+        // Validate enabled + licensed modules
+        const errors = [];
+        for (const m of ModuleRegistry.list()) {
+          if (!isEnabled(m.id)) continue;
+          if (!(licenseAllows(m.id) || m.priceModel === "free")) continue;
+          if (typeof m.validate === "function") {
+            const v = m.validate(state.farmData);
+            if (!v?.ok && v?.errors?.length) errors.push(...v.errors.map(e => `${m.id}: ${e}`));
+          }
+        }
+        if (errors.length) {
+          alert("Kan ikke lagre:\n\n" + errors.join("\n"));
           return;
         }
-        await dbSetFarm(state.farmData);
+
+        await dbSet(FARM_KEY, state.farmData);
         renderKPIs();
         setStatus("Lagret ✅");
       }
 
       async function resetFarm() {
         await dbClearAll();
+
         state.farmData = createNewFarm();
-        await dbSetFarm(state.farmData);
+        state.licenses = defaultLicenses();
+        state.modulePrefs = defaultModulePrefs();
+
+        // Always enable core modules
+        state.modulePrefs["farm.core"] = { enabled: true };
+        state.modulePrefs["area.core"] = { enabled: true };
+
+        ensureDataPatched();
+
+        await dbSet(FARM_KEY, state.farmData);
+        await dbSet(LICENSE_KEY, state.licenses);
+        await dbSet(MODULE_PREFS_KEY, state.modulePrefs);
+
         syncFarmToForm();
         renderKPIs();
+        renderModules();
+        renderTestModuleSelect();
+
         setStatus("Ny gård opprettet ✅");
       }
 
@@ -553,7 +942,13 @@
 
       async function exportBackup() {
         if (!state.farmData) return;
-        const payload = { exportedAt: new Date().toISOString(), appVersion: APP_VERSION, data: state.farmData };
+        const payload = {
+          exportedAt: nowIso(),
+          appVersion: APP_VERSION,
+          farm: state.farmData,
+          licenses: state.licenses,
+          modulePrefs: state.modulePrefs
+        };
         const safeName = (state.farmData.farm.name || "farm").toLowerCase().replace(/[^a-z0-9]+/g, "-");
         downloadJSON(`${safeName}-backup.json`, payload);
         setStatus("Backup eksportert ✅");
@@ -568,52 +963,158 @@
         let parsed;
         try { parsed = JSON.parse(text); } catch { alert("Ugyldig JSON-fil."); return; }
 
-        const data = parsed?.data ?? parsed;
-        const v = validateFarm(data);
+        // Support older format
+        const farm = parsed?.farm ?? parsed?.data ?? parsed;
+        const licenses = parsed?.licenses ?? null;
+        const modulePrefs = parsed?.modulePrefs ?? null;
+
+        const v = validateCore(farm);
         if (!v.ok) { alert("Import stoppet:\n\n" + v.errors.join("\n")); return; }
 
-        state.farmData = data;
-        state.farmData.meta.updatedAt = new Date().toISOString();
-        await dbSetFarm(state.farmData);
+        state.farmData = farm;
+        state.farmData.meta.updatedAt = nowIso();
+
+        state.licenses = licenses && typeof licenses === "object" ? licenses : defaultLicenses();
+        state.modulePrefs = modulePrefs && typeof modulePrefs === "object" ? modulePrefs : defaultModulePrefs();
+
+        // Ensure core on
+        state.modulePrefs["farm.core"] = { enabled: true };
+        state.modulePrefs["area.core"] = { enabled: true };
+
+        ensureDataPatched();
+
+        await dbSet(FARM_KEY, state.farmData);
+        await dbSet(LICENSE_KEY, state.licenses);
+        await dbSet(MODULE_PREFS_KEY, state.modulePrefs);
+
         syncFarmToForm();
         renderKPIs();
+        renderModules();
+        renderTestModuleSelect();
+
         setStatus("Importert ✅");
         input.value = "";
       }
 
-      function getTestCases() {
-        function assert(cond, msg) { if (!cond) throw new Error(msg); }
-        return [
-          {
-            name: "Ny gård validerer",
-            run: () => {
-              const d = createNewFarm();
-              const v = validateFarm(d);
-              assert(v.ok, "Ny gård feilet validering: " + v.errors.join(" | "));
+      // =========================
+      //  MODULE MANAGER UI
+      // =========================
+      function priceText(m) {
+        if (m.priceModel === "free") return "Gratis";
+        if (m.priceModel === "paid") return "Engangskjøp";
+        if (m.priceModel === "subscription") return "Abonnement";
+        return "—";
+      }
+
+      function renderModules() {
+        const host = $("#modulesList");
+        host.innerHTML = "";
+
+        for (const m of ModuleRegistry.list()) {
+          const lic = licenseLabel(m.id);
+          const enabled = isEnabled(m.id);
+          const allowed = licenseAllows(m.id) || m.priceModel === "free";
+          const deps = (m.dependsOn || []).join(", ");
+
+          const row = document.createElement("div");
+          row.className = "moduleRow";
+
+          const left = document.createElement("div");
+          left.className = "moduleMeta";
+          left.innerHTML = `
+            <div class="moduleTitle">${escapeHtml(m.title)}</div>
+            <div class="moduleDesc">${escapeHtml(m.description)}</div>
+            <div class="small">
+              <span class="pill">ID: ${escapeHtml(m.id)}</span>
+              <span class="pill">Pris: ${escapeHtml(priceText(m))}</span>
+              ${deps ? `<span class="pill">Avhengig av: ${escapeHtml(deps)}</span>` : ``}
+            </div>
+          `;
+
+          const right = document.createElement("div");
+          right.className = "moduleRight";
+
+          const topBadges = document.createElement("div");
+          topBadges.innerHTML = `
+            <span class="badge ${lic.cls}">${escapeHtml(lic.text)}</span>
+            <span class="badge ${enabled ? "on" : "off"}">${enabled ? "På" : "Av"}</span>
+          `;
+
+          const actions = document.createElement("div");
+          actions.className = "moduleActions";
+
+          // Enable toggle
+          const btnToggle = document.createElement("button");
+          btnToggle.className = "btn secondary";
+          btnToggle.textContent = enabled ? "Skru av" : "Skru på";
+          btnToggle.disabled = !allowed; // can't enable if locked
+          btnToggle.addEventListener("click", async () => {
+            // check dependencies when turning on
+            if (!enabled) {
+              const deps = m.dependsOn || [];
+              const missing = deps.filter(d => !isEnabled(d) || !(licenseAllows(d) || ModuleRegistry.get(d)?.priceModel === "free"));
+              if (missing.length) {
+                alert("Kan ikke slå på. Mangler/er låst:\n\n" + missing.join("\n"));
+                return;
+              }
             }
-          },
-          {
-            name: "Areal kan ikke være negativt",
-            run: () => {
-              const d = createNewFarm();
-              d.farm.area.utmarkDaa = -1;
-              const v = validateFarm(d);
-              assert(!v.ok, "Validering skulle feile ved negativ utmark.");
-            }
+            await setEnabled(m.id, !enabled);
+            ensureDataPatched();
+            await saveFarm(); // persist patches
+          });
+
+          // Unlock button for paid/subscription
+          const btnUnlock = document.createElement("button");
+          btnUnlock.className = "btn";
+          btnUnlock.textContent = allowed ? "Administrer" : "Lås opp";
+          btnUnlock.addEventListener("click", () => openLicenseModal(m.id));
+
+          // If free, "Administrer" just opens modal too (shows status)
+          actions.appendChild(btnToggle);
+          actions.appendChild(btnUnlock);
+
+          right.appendChild(topBadges);
+          right.appendChild(actions);
+
+          row.appendChild(left);
+          row.appendChild(right);
+          host.appendChild(row);
+        }
+      }
+
+      // =========================
+      //  TEST RUNNER (PER MODULE)
+      // =========================
+      function getTestCasesFor(moduleIdOrAll) {
+        const list = [];
+        const mods = ModuleRegistry.list();
+
+        for (const m of mods) {
+          if (moduleIdOrAll !== "ALL" && m.id !== moduleIdOrAll) continue;
+
+          // You can run tests even if module is locked, but we show lock in UI.
+          // For strictness, we keep it: run tests for selected module regardless (dev sanity).
+          for (const t of (m.tests || [])) {
+            list.push({ moduleId: m.id, name: t.name, run: t.run });
           }
-        ];
+        }
+        return list;
       }
 
       function renderTestResults(results) {
         const host = $("#testResults");
         host.innerHTML = "";
+
         for (const r of results) {
           const div = document.createElement("div");
           div.className = "resultItem";
           const badge = `<span class="badge ${r.ok ? "ok" : "fail"}">${r.ok ? "OK" : "FEIL"}</span>`;
           div.innerHTML = `
             <div style="display:flex;gap:10px;align-items:center;justify-content:space-between">
-              <div style="font-weight:800">${escapeHtml(r.name)}</div>
+              <div style="font-weight:900; min-width:0">
+                <div>${escapeHtml(r.name)}</div>
+                <div class="small">Modul: ${escapeHtml(r.moduleId)}</div>
+              </div>
               ${badge}
             </div>
             ${r.ok ? "" : `<div class="small">${escapeHtml(r.error)}</div>`}
@@ -622,18 +1123,76 @@
         }
       }
 
-      function runAllTests() {
-        const cases = getTestCases();
+      function runTests(moduleIdOrAll) {
+        const cases = getTestCasesFor(moduleIdOrAll);
         const results = [];
+
         for (const t of cases) {
-          try { t.run(); results.push({ name: t.name, ok: true }); }
-          catch (e) { results.push({ name: t.name, ok: false, error: e?.message ?? String(e) }); }
+          try { t.run(); results.push({ moduleId: t.moduleId, name: t.name, ok: true }); }
+          catch (e) { results.push({ moduleId: t.moduleId, name: t.name, ok: false, error: e?.message ?? String(e) }); }
         }
+
         renderTestResults(results);
         const okCount = results.filter(r => r.ok).length;
         setStatus(`Tester: ${okCount}/${results.length} OK`);
       }
 
+      function renderTestModuleSelect() {
+        const sel = $("#testModuleSelect");
+        sel.innerHTML = "";
+
+        const optAll = document.createElement("option");
+        optAll.value = "ALL";
+        optAll.textContent = "Alle moduler";
+        sel.appendChild(optAll);
+
+        for (const m of ModuleRegistry.list()) {
+          const opt = document.createElement("option");
+          opt.value = m.id;
+          opt.textContent = `${m.title} (${m.id})`;
+          sel.appendChild(opt);
+        }
+      }
+
+      // =========================
+      //  LOAD / INIT
+      // =========================
+      async function loadOrCreate() {
+        setStatus("Laster data…");
+
+        const farm = await dbGet(FARM_KEY);
+        const lic = await dbGet(LICENSE_KEY);
+        const prefs = await dbGet(MODULE_PREFS_KEY);
+
+        state.farmData = farm || createNewFarm();
+        state.licenses = lic || defaultLicenses();
+        state.modulePrefs = prefs || defaultModulePrefs();
+
+        // Always enable core
+        state.modulePrefs["farm.core"] = { enabled: true };
+        state.modulePrefs["area.core"] = { enabled: true };
+
+        // Patch enabled licensed modules
+        ensureDataPatched();
+
+        // Validate core at least
+        const v = validateCore(state.farmData);
+        if (!v.ok) setStatus("Datafeil: ta backup før vi fikser.");
+        else setStatus("Klar ✅");
+
+        await dbSet(FARM_KEY, state.farmData);
+        await dbSet(LICENSE_KEY, state.licenses);
+        await dbSet(MODULE_PREFS_KEY, state.modulePrefs);
+
+        syncFarmToForm();
+        renderKPIs();
+        renderModules();
+        renderTestModuleSelect();
+      }
+
+      // =========================
+      //  UI WIRING
+      // =========================
       function wireUI() {
         $$("#tabs .tab").forEach(b => b.addEventListener("click", () => routeTo(b.dataset.route)));
 
@@ -657,7 +1216,33 @@
           if (confirm("Import overskriver gjeldende gård i appen.\n\nFortsette?")) importBackup();
         });
 
-        $("#btnRunTests").addEventListener("click", runAllTests);
+        $("#btnRunTestsAll").addEventListener("click", () => runTests("ALL"));
+        $("#btnRunTestsModule").addEventListener("click", () => {
+          const id = $("#testModuleSelect").value || "ALL";
+          runTests(id);
+        });
+
+        // License modal
+        $("#licenseOverlayBg").addEventListener("click", closeLicenseModal);
+        $("#btnCancelLicense").addEventListener("click", closeLicenseModal);
+        $("#btnApplyLicense").addEventListener("click", async () => {
+          const moduleId = state.licenseModalTarget;
+          if (!moduleId) return;
+          const res = await applyActivationCode(moduleId, $("#licenseCodeInput").value);
+          if (!res.ok) { alert(res.msg); return; }
+
+          // After unlock: auto-enable module
+          await dbSet(LICENSE_KEY, state.licenses);
+          await setEnabled(moduleId, true);
+
+          ensureDataPatched();
+          await saveFarm();
+          renderModules();
+          renderTestModuleSelect();
+
+          alert(res.msg);
+          closeLicenseModal();
+        });
       }
 
       (async function boot() {
