@@ -127,7 +127,6 @@
     .moduleRight{display:flex; flex-direction:column; gap:8px; align-items:flex-end}
     .moduleActions{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
 
-    /* Kontrollpanel tiles */
     .tileGrid{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -211,7 +210,6 @@
       <button class="tab" data-route="modules">Moduler</button>
     </nav>
 
-    <!-- KONTROLLPANEL -->
     <section class="panel" data-view="dashboard">
       <h1>Kontrollpanel</h1>
       <p class="muted">Hurtigtaster for det du gjør ofte. Du bestemmer hva som vises og rekkefølgen (🧩 Panel).</p>
@@ -223,14 +221,12 @@
       </div>
     </section>
 
-    <!-- ARBEID -->
     <section class="panel hidden" data-view="work">
       <h1>Arbeid</h1>
       <p class="muted">Her vises UI for aktive moduler (gratis + låst opp).</p>
       <div id="workHost"></div>
     </section>
 
-    <!-- MIN GÅRD (INNSTILLINGER) -->
     <section class="panel hidden" data-view="settings">
       <h1>Min gård</h1>
       <p class="muted">Gårdsdata, status og kontroll. Kontrollpanelet er for handling.</p>
@@ -291,7 +287,7 @@
             <div style="font-size:18px;font-weight:900" id="kpiShopCount">—</div>
           </div>
         </div>
-        <div class="hint">Hvis tall ser rare ut: ta backup og/eller kjør Selvtest.</div>
+        <div class="hint">Hvis ting oppfører seg rart: ta backup og/eller kjør Selvtest.</div>
       </div>
 
       <div class="card">
@@ -304,7 +300,6 @@
       </div>
     </section>
 
-    <!-- KONTROLLPANEL-OPPSETT -->
     <section class="panel hidden" data-view="panelsetup">
       <h1>Kontrollpanel</h1>
       <p class="muted">Vis/skjul snarveier og flytt rekkefølge (⬆/⬇). De tre basis-knappene kan flyttes, men ikke skrus av.</p>
@@ -315,7 +310,6 @@
       </div>
     </section>
 
-    <!-- BACKUP -->
     <section class="panel hidden" data-view="backup">
       <h1>Backup</h1>
       <div class="card">
@@ -332,7 +326,6 @@
       </div>
     </section>
 
-    <!-- TESTS -->
     <section class="panel hidden" data-view="tests">
       <h1>Selvtest</h1>
       <div class="card">
@@ -351,7 +344,6 @@
       </div>
     </section>
 
-    <!-- MODULE STORE -->
     <section class="panel hidden" data-view="modules">
       <h1>Moduler</h1>
 
@@ -370,7 +362,6 @@
     </section>
   </main>
 
-  <!-- License modal -->
   <div class="overlay hidden" id="licenseOverlay">
     <div class="overlayBg" id="licenseOverlayBg"></div>
     <div class="modal">
@@ -391,7 +382,6 @@
     </div>
   </div>
 
-  <!-- Editor modal -->
   <div class="overlay hidden" id="editorOverlay">
     <div class="overlayBg" id="editorOverlayBg"></div>
     <div class="modal">
@@ -409,10 +399,7 @@
     (function () {
       "use strict";
 
-      // =========================
-      //  APP / DB BASICS
-      // =========================
-      const APP_VERSION = "0.8.0";
+      const APP_VERSION = "0.8.1";
       const DB_NAME = "farmapp_db";
       const DB_VERSION = 4;
       const STORE = "documents";
@@ -428,33 +415,136 @@
         farmData: null,
         licenses: null,
         modulePrefs: null,
-        panelPrefs: null,      // { visible: {actionId: bool}, order: [actionId...] }
+        panelPrefs: null,
         licenseModalTarget: null,
-        editor: { onSave: null, value: null, fields: [] }
+        editor: { onSave: null, onCancel: null, value: null, fields: [] }
       };
 
       function setStatus(text) { $("#statusLine").textContent = text; }
       function nowIso(){ return new Date().toISOString(); }
-
       function fmtDate(iso) {
         if (!iso) return "—";
         const d = new Date(iso);
         return d.toLocaleString("no-NO", { dateStyle: "medium", timeStyle: "short" });
       }
-
-      function num(v) {
-        const n = Number(v);
-        return Number.isFinite(n) ? n : 0;
-      }
-
+      function num(v) { const n = Number(v); return Number.isFinite(n) ? n : 0; }
       function escapeHtml(s) {
         return String(s).replace(/[&<>"']/g, (c) => ({
           "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
         }[c]));
       }
+      function uuid() {
+        try { return crypto.randomUUID(); } catch { return String(Date.now()) + "-" + Math.random().toString(16).slice(2); }
+      }
 
       // =========================
-      //  ICONS (inline SVG)
+      //  STORAGE (IndexedDB -> localStorage fallback)
+      // =========================
+      let storageMode = "indexeddb"; // or "localstorage"
+      function lsKey(k){ return `${DB_NAME}::${k}`; }
+
+      function openDB() {
+        return new Promise((resolve, reject) => {
+          const req = indexedDB.open(DB_NAME, DB_VERSION);
+          req.onupgradeneeded = () => {
+            const db = req.result;
+            if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE);
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      }
+
+      async function idbGet(key) {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE, "readonly");
+          const store = tx.objectStore(STORE);
+          const req = store.get(key);
+          req.onsuccess = () => { db.close(); resolve(req.result ?? null); };
+          req.onerror = () => { db.close(); reject(req.error); };
+        });
+      }
+
+      async function idbSet(key, value) {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE, "readwrite");
+          tx.objectStore(STORE).put(value, key);
+          tx.oncomplete = () => { db.close(); resolve(); };
+          tx.onerror = () => { db.close(); reject(tx.error); };
+        });
+      }
+
+      async function idbClearAll() {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE, "readwrite");
+          tx.objectStore(STORE).clear();
+          tx.oncomplete = () => { db.close(); resolve(); };
+          tx.onerror = () => { db.close(); reject(tx.error); };
+        });
+      }
+
+      function lsGet(key){
+        const raw = localStorage.getItem(lsKey(key));
+        if (!raw) return null;
+        try { return JSON.parse(raw); } catch { return null; }
+      }
+      function lsSet(key, value){
+        localStorage.setItem(lsKey(key), JSON.stringify(value));
+      }
+      function lsClearAll(){
+        const prefix = lsKey("");
+        const keys = [];
+        for (let i=0;i<localStorage.length;i++){
+          const k = localStorage.key(i);
+          if (k && k.startsWith(prefix)) keys.push(k);
+        }
+        keys.forEach(k => localStorage.removeItem(k));
+      }
+
+      async function dbProbe(){
+        try {
+          const probeKey = "__probe__";
+          await idbSet(probeKey, { t: Date.now() });
+          const v = await idbGet(probeKey);
+          if (!v) throw new Error("probe missing");
+          storageMode = "indexeddb";
+          setStatus("Klar ✅ (IndexedDB)");
+        } catch (e) {
+          storageMode = "localstorage";
+          setStatus("Klar ✅ (localStorage fallback)");
+        }
+      }
+
+      async function dbGet(key){
+        if (storageMode === "localstorage") return lsGet(key);
+        try { return await idbGet(key); }
+        catch {
+          storageMode = "localstorage";
+          return lsGet(key);
+        }
+      }
+      async function dbSet(key, value){
+        if (storageMode === "localstorage") return lsSet(key, value);
+        try { return await idbSet(key, value); }
+        catch {
+          storageMode = "localstorage";
+          return lsSet(key, value);
+        }
+      }
+      async function dbClearAll(){
+        if (storageMode === "localstorage") return lsClearAll();
+        try { return await idbClearAll(); }
+        catch {
+          storageMode = "localstorage";
+          return lsClearAll();
+        }
+      }
+
+      // =========================
+      //  ICONS
       // =========================
       const ICONS = {
         event: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -479,52 +569,6 @@
       };
 
       // =========================
-      //  DB
-      // =========================
-      function openDB() {
-        return new Promise((resolve, reject) => {
-          const req = indexedDB.open(DB_NAME, DB_VERSION);
-          req.onupgradeneeded = () => {
-            const db = req.result;
-            if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE);
-          };
-          req.onsuccess = () => resolve(req.result);
-          req.onerror = () => reject(req.error);
-        });
-      }
-
-      async function dbGet(key) {
-        const db = await openDB();
-        return new Promise((resolve, reject) => {
-          const tx = db.transaction(STORE, "readonly");
-          const store = tx.objectStore(STORE);
-          const req = store.get(key);
-          req.onsuccess = () => { db.close(); resolve(req.result ?? null); };
-          req.onerror = () => { db.close(); reject(req.error); };
-        });
-      }
-
-      async function dbSet(key, value) {
-        const db = await openDB();
-        return new Promise((resolve, reject) => {
-          const tx = db.transaction(STORE, "readwrite");
-          tx.objectStore(STORE).put(value, key);
-          tx.oncomplete = () => { db.close(); resolve(); };
-          tx.onerror = () => { db.close(); reject(tx.error); };
-        });
-      }
-
-      async function dbClearAll() {
-        const db = await openDB();
-        return new Promise((resolve, reject) => {
-          const tx = db.transaction(STORE, "readwrite");
-          tx.objectStore(STORE).clear();
-          tx.oncomplete = () => { db.close(); resolve(); };
-          tx.onerror = () => { db.close(); reject(tx.error); };
-        });
-      }
-
-      // =========================
       //  MODULE REGISTRY
       // =========================
       const ModuleRegistry = (() => {
@@ -536,16 +580,14 @@
       })();
 
       // =========================
-      //  ACTION REGISTRY (future-friendly)
+      //  ACTION REGISTRY
       // =========================
-      // actionId => { title(), subtitle(), iconSvg(), isPinned, isToggleable, run() }
       const ActionRegistry = (() => {
         const actions = new Map();
         function set(actionId, def){ actions.set(actionId, def); }
         function get(actionId){ return actions.get(actionId) || null; }
         function has(actionId){ return actions.has(actionId); }
-        function list(){ return [...actions.entries()].map(([id, def]) => ({ id, def })); }
-        return { set, get, has, list };
+        return { set, get, has };
       })();
 
       // =========================
@@ -556,7 +598,7 @@
         return {
           meta: { schemaVersion: APP_VERSION, createdAt: now, updatedAt: now },
           farm: {
-            id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()),
+            id: uuid(),
             name: "Min gård",
             area: { dyrketDaa: 0, beiteDaa: 0, utmarkDaa: 0 },
             modules: {}
@@ -600,15 +642,32 @@
         return out;
       }
 
-      // Control panel prefs:
-      // - fixed pinned actions must always be visible (but can be moved)
-      // - order array defines display order
+      function getPinnedActionIds() { return ["events.new", "shopping.new", "todo.new"]; }
+
       function defaultPanelPrefs() {
         const pinned = getPinnedActionIds();
         return {
           visible: Object.fromEntries(pinned.map(id => [id, true])),
-          order: pinned.slice() // starts with pinned only
+          order: pinned.slice()
         };
+      }
+
+      function normalizePanelPrefs(pp) {
+        const pinned = getPinnedActionIds();
+        const out = {
+          visible: (pp && typeof pp.visible === "object") ? { ...pp.visible } : {},
+          order: Array.isArray(pp?.order) ? pp.order.slice() : []
+        };
+        for (const id of pinned) out.visible[id] = true;
+
+        out.order = out.order.filter(x => typeof x === "string" && x.trim());
+        for (const id of pinned) if (!out.order.includes(id)) out.order.unshift(id);
+
+        const uniq = [];
+        const seen = new Set();
+        for (const id of out.order) { if (!seen.has(id)) { seen.add(id); uniq.push(id); } }
+        out.order = uniq;
+        return out;
       }
 
       function licenseAllows(moduleId) {
@@ -631,19 +690,14 @@
         return { cls: "locked", text: "Låst" };
       }
 
-      function isEnabled(moduleId) {
-        const p = state.modulePrefs?.[moduleId];
-        return p ? !!p.enabled : false;
-      }
+      function isEnabled(moduleId) { return !!state.modulePrefs?.[moduleId]?.enabled; }
 
       async function setEnabled(moduleId, enabled) {
         state.modulePrefs[moduleId] = { enabled: !!enabled };
         await dbSet(MODULE_PREFS_KEY, state.modulePrefs);
         ensureDataPatched();
         await saveFarm();
-        renderModules();
-        renderWork();
-        renderKPIs();
+        renderModules(); renderWork(); renderKPIs();
       }
 
       async function applyActivationCode(moduleId, code) {
@@ -683,6 +737,7 @@
 
       function openEditor(cfg) {
         state.editor.onSave = cfg.onSave || null;
+        state.editor.onCancel = cfg.onCancel || null;
         state.editor.value = JSON.parse(JSON.stringify(cfg.value || {}));
         state.editor.fields = cfg.fields || [];
 
@@ -727,9 +782,13 @@
 
         $("#editorOverlay").classList.remove("hidden");
       }
-      function closeEditor() {
+      function closeEditor(runCancel=false) {
+        if (runCancel && typeof state.editor.onCancel === "function") {
+          try { state.editor.onCancel(); } catch {}
+        }
         $("#editorOverlay").classList.add("hidden");
         state.editor.onSave = null;
+        state.editor.onCancel = null;
         state.editor.value = null;
         state.editor.fields = [];
       }
@@ -802,7 +861,7 @@
 
         await dbSet(FARM_KEY, state.farmData);
         $("#topTitle").textContent = state.farmData.farm.name;
-        setStatus("Lagret ✅");
+        setStatus(`Lagret ✅ (${storageMode})`);
       }
 
       function downloadJSON(filename, obj) {
@@ -821,6 +880,7 @@
         const payload = {
           exportedAt: nowIso(),
           appVersion: APP_VERSION,
+          storageMode,
           farm: state.farmData,
           licenses: state.licenses,
           modulePrefs: state.modulePrefs,
@@ -853,15 +913,9 @@
         state.modulePrefs = (modulePrefs && typeof modulePrefs === "object") ? modulePrefs : defaultModulePrefs();
         state.panelPrefs = normalizePanelPrefs((panelPrefs && typeof panelPrefs === "object") ? panelPrefs : defaultPanelPrefs());
 
-        // Always enable core
         state.modulePrefs["farm.core"] = { enabled: true };
         state.modulePrefs["area.core"] = { enabled: true };
-
-        // Ensure default free modules ON
-        ["events.core","todo.core","shopping.core","timer.jobs"].forEach(id => {
-          if (!state.modulePrefs[id]) state.modulePrefs[id] = { enabled:true };
-          else state.modulePrefs[id].enabled = true;
-        });
+        ["events.core","todo.core","shopping.core","timer.jobs"].forEach(id => state.modulePrefs[id] = { enabled:true });
 
         ensureDataPatched();
 
@@ -871,11 +925,7 @@
         await dbSet(PANEL_PREFS_KEY, state.panelPrefs);
 
         syncFarmToForm();
-        renderKPIs();
-        renderModules();
-        renderWork();
-        renderDashboard();
-        renderPanelSetup();
+        renderKPIs(); renderModules(); renderWork(); renderDashboard(); renderPanelSetup(); renderTestModuleSelect();
         setStatus("Importert ✅");
         input.value = "";
       }
@@ -887,12 +937,9 @@
         state.modulePrefs = defaultModulePrefs();
         state.panelPrefs = normalizePanelPrefs(defaultPanelPrefs());
 
-        // Always enable core
         state.modulePrefs["farm.core"] = { enabled: true };
         state.modulePrefs["area.core"] = { enabled: true };
-
-        // Enable default free modules
-        ["events.core","todo.core","shopping.core","timer.jobs"].forEach(id => state.modulePrefs[id] = { enabled: true });
+        ["events.core","todo.core","shopping.core","timer.jobs"].forEach(id => state.modulePrefs[id] = { enabled:true });
 
         ensureDataPatched();
 
@@ -902,18 +949,13 @@
         await dbSet(PANEL_PREFS_KEY, state.panelPrefs);
 
         syncFarmToForm();
-        renderKPIs();
-        renderModules();
-        renderWork();
-        renderDashboard();
-        renderPanelSetup();
+        renderKPIs(); renderModules(); renderWork(); renderDashboard(); renderPanelSetup(); renderTestModuleSelect();
         setStatus("Ny gård opprettet ✅");
       }
 
       // =========================
       //  MODULES
       // =========================
-
       ModuleRegistry.add({
         id: "farm.core",
         title: "Kjerne: Gård",
@@ -956,7 +998,6 @@
         }}]
       });
 
-      // Hendelser (gratis)
       ModuleRegistry.add({
         id: "events.core",
         title: "Hendelser",
@@ -1085,7 +1126,6 @@
         }}]
       });
 
-      // TO DO (gratis)
       ModuleRegistry.add({
         id: "todo.core",
         title: "TO DO",
@@ -1094,9 +1134,7 @@
         defaultEnabled: true,
         dependsOn: ["farm.core"],
         order: 50,
-        dataPatch: (d) => {
-          if (!d.farm.modules.todo) d.farm.modules.todo = { items: [] };
-        },
+        dataPatch: (d) => { if (!d.farm.modules.todo) d.farm.modules.todo = { items: [] }; },
         validate: (d) => {
           const t = d?.farm?.modules?.todo;
           if (!t || !Array.isArray(t.items)) return { ok:false, errors:["todo.items må være liste."] };
@@ -1188,7 +1226,6 @@
         }}]
       });
 
-      // Handleliste (gratis)
       ModuleRegistry.add({
         id: "shopping.core",
         title: "Handleliste",
@@ -1397,7 +1434,6 @@
         }}]
       });
 
-      // Jobbklokke (gratis) – Start jobb / Stop jobb + ufakturerte jobber
       ModuleRegistry.add({
         id: "timer.jobs",
         title: "Jobbklokke",
@@ -1408,8 +1444,8 @@
         order: 65,
         dataPatch: (d) => {
           if (!d.farm.modules.jobTimer) d.farm.modules.jobTimer = {
-            running: null, // {id, customer, task, note, startedAt}
-            sessions: []   // each: {id, customer, task, note, startedAt, endedAt, minutes, status: 'unbilled'|'billed'}
+            running: null,
+            sessions: []
           };
         },
         validate: (d) => {
@@ -1457,7 +1493,7 @@
               n.textContent = "Ingen ufakturerte jobber ennå.";
               rows.appendChild(n);
             } else {
-              unbilled.forEach((s, i) => {
+              unbilled.forEach((s) => {
                 const row = document.createElement("div");
                 row.className = "moduleRow";
                 const dur = (s.minutes ?? 0);
@@ -1474,7 +1510,6 @@
                   </div>
                 `;
                 row.querySelector('[data-e="bill"]').addEventListener("click", async () => {
-                  // find by id
                   const idx = jt.sessions.findIndex(x => x.id === s.id);
                   if (idx >= 0) jt.sessions[idx].status = "billed";
                   await api.saveAndRefresh();
@@ -1499,7 +1534,6 @@
         }}]
       });
 
-      // Arealenheter/skifter (paid)
       ModuleRegistry.add({
         id: "area.units",
         title: "Areal: Skifter",
@@ -1508,9 +1542,7 @@
         defaultEnabled: false,
         dependsOn: ["farm.core","area.core"],
         order: 70,
-        dataPatch: (d) => {
-          if (!d.farm.modules.areaUnits) d.farm.modules.areaUnits = { units: [] };
-        },
+        dataPatch: (d) => { if (!d.farm.modules.areaUnits) d.farm.modules.areaUnits = { units: [] }; },
         validate: (d) => {
           const mod = d?.farm?.modules?.areaUnits;
           if (!mod || !Array.isArray(mod.units)) return { ok:false, errors:["areaUnits.units må være liste."] };
@@ -1591,7 +1623,7 @@
       });
 
       // =========================
-      //  ACTIONS (used by tiles + modules)
+      //  ACTIONS
       // =========================
       function createActions(){
         const ensureEnabledOrUnlock = async (moduleId) => {
@@ -1626,15 +1658,9 @@
             const mod = ModuleRegistry.get(moduleId);
             const allowed = licenseAllows(moduleId) || mod?.priceModel === "free";
             if (!allowed) { openLicenseModal(moduleId); return; }
-            if (!isEnabled(moduleId)) await setEnabled(moduleId, true); // no questions (your rule)
+            if (!isEnabled(moduleId)) await setEnabled(moduleId, true);
             ensureDataPatched();
             await refreshAll(true);
-            // scroll to module card by id label
-            setTimeout(() => {
-              const cards = [...document.querySelectorAll("#workHost .card")];
-              const target = cards.find(c => (c.textContent || "").includes(moduleId));
-              if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
-            }, 150);
           },
 
           newEvent: async (goToWork=false) => {
@@ -1643,7 +1669,7 @@
             const ev = state.farmData.farm.modules.events;
 
             const newItem = {
-              id: crypto.randomUUID?.() || String(Date.now()),
+              id: uuid(),
               date: nowIso().slice(0,10),
               category: ev.categories?.[0] || "Notat",
               text: ""
@@ -1659,8 +1685,13 @@
                 { key:"text", label:"Tekst", type:"textarea" }
               ],
               value: newItem,
+              onCancel: () => {
+                const first = ev.entries[0];
+                if (first && first.id === newItem.id && !(first.text||"").trim()) ev.entries.shift();
+              },
               onSave: async (nv) => {
                 ev.entries[0] = { ...ev.entries[0], ...nv };
+                if (!String(ev.entries[0].text||"").trim()) { alert("Skriv tekst før lagring."); return; }
                 await refreshAll(goToWork);
               }
             });
@@ -1670,7 +1701,7 @@
             const ok = await ensureEnabledOrUnlock("todo.core");
             if (!ok) return;
             const t = state.farmData.farm.modules.todo;
-            const it = { id: crypto.randomUUID?.()||String(Date.now()), text:"", dueDate:"", done:false };
+            const it = { id: uuid(), text:"", dueDate:"", done:false };
             t.items.unshift(it);
 
             openEditor({
@@ -1681,8 +1712,13 @@
                 { key:"dueDate", label:"Frist (valgfritt, YYYY-MM-DD)", type:"text" }
               ],
               value: it,
+              onCancel: () => {
+                const first = t.items[0];
+                if (first && first.id === it.id && !(first.text||"").trim()) t.items.shift();
+              },
               onSave: async (nv) => {
                 t.items[0] = { ...t.items[0], ...nv };
+                if (!String(t.items[0].text||"").trim()) { alert("Skriv tekst før lagring."); return; }
                 await refreshAll(goToWork);
               }
             });
@@ -1692,13 +1728,7 @@
             const ok = await ensureEnabledOrUnlock("shopping.core");
             if (!ok) return;
             const s = state.farmData.farm.modules.shopping;
-            const it = {
-              id: crypto.randomUUID?.()||String(Date.now()),
-              name:"",
-              qty:"",
-              supplier: s.suppliers?.[0] || "Annet",
-              bought:false
-            };
+            const it = { id: uuid(), name:"", qty:"", supplier: s.suppliers?.[0] || "Annet", bought:false };
             s.items.unshift(it);
 
             openEditor({
@@ -1710,8 +1740,13 @@
                 { key:"supplier", label:"Leverandør", type:"select", options: (s.suppliers||["Annet"]).map(x => [x,x]) }
               ],
               value: it,
+              onCancel: () => {
+                const first = s.items[0];
+                if (first && first.id === it.id && !(first.name||"").trim()) s.items.shift();
+              },
               onSave: async (nv) => {
                 s.items[0] = { ...s.items[0], ...nv };
+                if (!String(s.items[0].name||"").trim()) { alert("Skriv varenavn før lagring."); return; }
                 await refreshAll(goToWork);
               }
             });
@@ -1721,11 +1756,7 @@
             const ok = await ensureEnabledOrUnlock("timer.jobs");
             if (!ok) return;
             const jt = state.farmData.farm.modules.jobTimer;
-
-            if (jt.running) {
-              alert("En jobb pågår allerede. Stopp den først.");
-              return;
-            }
+            if (jt.running) { alert("En jobb pågår allerede. Stopp den først."); return; }
 
             const draft = { customer:"", task:"", note:"" };
             openEditor({
@@ -1740,16 +1771,8 @@
               onSave: async (nv) => {
                 const customer = (nv.customer||"").trim();
                 const task = (nv.task||"").trim();
-                if (!customer || !task) {
-                  alert("Fyll inn både Kunde og Hva gjør du.");
-                  return;
-                }
-                jt.running = {
-                  id: crypto.randomUUID?.() || String(Date.now()),
-                  customer, task,
-                  note: (nv.note||"").trim(),
-                  startedAt: nowIso()
-                };
+                if (!customer || !task) { alert("Fyll inn både Kunde og Hva gjør du."); return; }
+                jt.running = { id: uuid(), customer, task, note:(nv.note||"").trim(), startedAt: nowIso() };
                 await refreshAll(goToWork);
               }
             });
@@ -1759,11 +1782,7 @@
             const ok = await ensureEnabledOrUnlock("timer.jobs");
             if (!ok) return;
             const jt = state.farmData.farm.modules.jobTimer;
-
-            if (!jt.running) {
-              alert("Ingen jobb pågår.");
-              return;
-            }
+            if (!jt.running) { alert("Ingen jobb pågår."); return; }
 
             const end = nowIso();
             const r = jt.running;
@@ -1774,7 +1793,7 @@
               note: r.note || "",
               startedAt: r.startedAt,
               endedAt: end,
-              minutes: minutesBetween(r.startedAt, end),
+              minutes: Math.round((new Date(end)-new Date(r.startedAt))/60000),
               status: "unbilled"
             });
             jt.running = null;
@@ -1785,7 +1804,7 @@
             const ok = await ensureEnabledOrUnlock("area.units");
             if (!ok) return;
             const a = state.farmData.farm.modules.areaUnits;
-            const it = { id: crypto.randomUUID?.()||String(Date.now()), name:"", type:"dyrket", areaDaa:1 };
+            const it = { id: uuid(), name:"", type:"dyrket", areaDaa:1 };
             a.units.unshift(it);
 
             openEditor({
@@ -1799,9 +1818,14 @@
                 { key:"areaDaa", label:"Areal (daa)", type:"number" }
               ],
               value: it,
+              onCancel: () => {
+                const first = a.units[0];
+                if (first && first.id === it.id && !(first.name||"").trim()) a.units.shift();
+              },
               onSave: async (nv) => {
                 nv.areaDaa = Number(nv.areaDaa);
                 a.units[0] = { ...a.units[0], ...nv };
+                if (!String(a.units[0].name||"").trim()) { alert("Skriv navn før lagring."); return; }
                 await refreshAll(goToWork);
               }
             });
@@ -1810,100 +1834,42 @@
       }
 
       // =========================
-      //  PANEL PREFS (pinned + order + visibility)
+      //  PANEL PREFS
       // =========================
-      function getPinnedActionIds() {
-        // Your fixed 3 shortcuts (moveable, not removable)
-        return ["events.new", "shopping.new", "todo.new"];
-      }
-
-      function normalizePanelPrefs(pp) {
-        const pinned = getPinnedActionIds();
-        const out = {
-          visible: (pp && typeof pp.visible === "object") ? { ...pp.visible } : {},
-          order: Array.isArray(pp?.order) ? pp.order.slice() : []
-        };
-
-        // Ensure pinned always visible
-        for (const id of pinned) out.visible[id] = true;
-
-        // Ensure order contains pinned (keep existing order, but add missing)
-        const seen = new Set(out.order);
-        // Remove unknown (optional: we keep unknown, but it can break. safer to keep only existing actions + module actions)
-        out.order = out.order.filter(x => typeof x === "string" && x.trim());
-
-        for (const id of pinned) {
-          if (!out.order.includes(id)) out.order.unshift(id);
-        }
-
-        // Ensure order only unique
-        const uniq = [];
-        const seen2 = new Set();
-        for (const id of out.order) {
-          if (seen2.has(id)) continue;
-          seen2.add(id);
-          uniq.push(id);
-        }
-        out.order = uniq;
-
-        return out;
-      }
-
       async function savePanelPrefs() {
         state.panelPrefs = normalizePanelPrefs(state.panelPrefs);
         await dbSet(PANEL_PREFS_KEY, state.panelPrefs);
       }
-
-      function panelIsVisible(actionId) {
-        return !!state.panelPrefs?.visible?.[actionId];
-      }
+      function panelIsVisible(actionId) { return !!state.panelPrefs?.visible?.[actionId]; }
 
       async function panelSetVisible(actionId, visible) {
-        // pinned cannot be turned off
         if (getPinnedActionIds().includes(actionId)) visible = true;
-
         state.panelPrefs.visible[actionId] = !!visible;
-
-        // If turning on, ensure it's in order
-        if (visible && !state.panelPrefs.order.includes(actionId)) {
-          state.panelPrefs.order.push(actionId);
-        }
-
+        if (visible && !state.panelPrefs.order.includes(actionId)) state.panelPrefs.order.push(actionId);
         await savePanelPrefs();
-        renderDashboard();
-        renderPanelSetup();
       }
 
       async function panelMove(actionId, dir) {
         const order = state.panelPrefs.order.slice();
         const idx = order.indexOf(actionId);
         if (idx < 0) return;
-
         const swapWith = dir === "up" ? idx - 1 : idx + 1;
         if (swapWith < 0 || swapWith >= order.length) return;
-
-        // Swap
         [order[idx], order[swapWith]] = [order[swapWith], order[idx]];
         state.panelPrefs.order = order;
-
         await savePanelPrefs();
-        renderDashboard();
-        renderPanelSetup();
       }
 
       // =========================
-      //  ACTIONS REGISTERED (fixed + optional + module shortcuts)
+      //  ACTIONS REGISTERED
       // =========================
       function registerBaseActions() {
         const actions = createActions();
 
-        // Fixed pinned
         ActionRegistry.set("events.new", {
           title: () => "Ny hendelse",
           subtitle: () => "Velg kategori",
           iconSvg: () => ICONS.event,
-          isPinned: true,
-          isToggleable: false,
           run: async () => actions.newEvent(false)
         });
 
@@ -1911,8 +1877,6 @@
           title: () => "Ny vare",
           subtitle: () => "Handleliste",
           iconSvg: () => ICONS.shop,
-          isPinned: true,
-          isToggleable: false,
           run: async () => actions.newShoppingItem(false)
         });
 
@@ -1920,12 +1884,9 @@
           title: () => "Nytt gjøremål",
           subtitle: () => "TO DO",
           iconSvg: () => ICONS.todo,
-          isPinned: true,
-          isToggleable: false,
           run: async () => actions.newTodo(false)
         });
 
-        // Optional actions
         ActionRegistry.set("job.toggle", {
           title: () => {
             const jt = state.farmData?.farm?.modules?.jobTimer;
@@ -1937,12 +1898,11 @@
             return `${jt.running.customer} · ${jt.running.task}`.slice(0, 40);
           },
           iconSvg: () => ICONS.clock,
-          isPinned: false,
-          isToggleable: true,
           run: async () => {
             const jt = state.farmData?.farm?.modules?.jobTimer;
             if (jt?.running) await actions.stopJob(false);
             else await actions.startJob(false);
+            renderDashboard(); renderKPIs();
           }
         });
 
@@ -1950,11 +1910,7 @@
           title: () => "Vær (yr.no)",
           subtitle: () => "Åpner i ny fane",
           iconSvg: () => ICONS.weather,
-          isPinned: false,
-          isToggleable: true,
-          run: async () => {
-            window.open("https://www.yr.no", "_blank", "noopener,noreferrer");
-          }
+          run: async () => { window.open("https://www.yr.no", "_blank", "noopener,noreferrer"); }
         });
       }
 
@@ -1969,27 +1925,21 @@
           title: () => mod?.title || moduleId,
           subtitle: () => "Åpne modul",
           iconSvg: () => ICONS.module,
-          isPinned: false,
-          isToggleable: true,
           run: async () => actions.openModule(moduleId)
         });
-
         return actionId;
       }
 
       // =========================
-      //  KONTROLLPANEL (tiles)
+      //  UI RENDERERS
       // =========================
       function renderDashboard(){
         const host = $("#dashboardTiles");
         const hint = $("#dashboardHint");
         host.innerHTML = "";
-
-        // Ensure order includes pinned at least, and remove actionIds that are no longer known (but keep module actions; they are known once ensured)
         state.panelPrefs = normalizePanelPrefs(state.panelPrefs);
 
         const visibleIds = state.panelPrefs.order.filter(id => panelIsVisible(id));
-
         if (!visibleIds.length) {
           hint.textContent = "Ingen knapper valgt. Trykk 🧩 Panel og slå på snarveier.";
           return;
@@ -1998,9 +1948,7 @@
 
         visibleIds.forEach(actionId => {
           const def = ActionRegistry.get(actionId);
-          // If unknown (e.g., module shortcut not registered yet), skip
           if (!def) return;
-
           const tile = document.createElement("div");
           tile.className = "tile";
           tile.innerHTML = `
@@ -2011,14 +1959,8 @@
             </div>
           `;
           tile.addEventListener("click", async () => {
-            try {
-              await def.run();
-              // Re-render in case title/subtitle changed (job toggle)
-              renderDashboard();
-              renderKPIs();
-            } catch (e) {
-              alert("Noe gikk galt: " + (e?.message || String(e)));
-            }
+            try { await def.run(); }
+            catch (e) { alert("Noe gikk galt: " + (e?.message || String(e))); }
           });
           host.appendChild(tile);
         });
@@ -2027,37 +1969,16 @@
       function renderPanelSetup(){
         const host = $("#panelSetupList");
         host.innerHTML = "";
-
         state.panelPrefs = normalizePanelPrefs(state.panelPrefs);
 
-        // Build a list of all toggleable actions + pinned
-        const ids = state.panelPrefs.order.slice(); // order determines display in setup too
+        const ids = state.panelPrefs.order.slice();
+        for (const extraId of ["job.toggle","weather.yr"]) if (!ids.includes(extraId)) ids.push(extraId);
 
-        // Ensure optional base actions exist in setup even if not in order
-        // (job/weather)
-        for (const extraId of ["job.toggle","weather.yr"]) {
-          if (!state.panelPrefs.order.includes(extraId)) {
-            // not adding to order automatically (until user turns it on),
-            // but we want it visible in setup list: add temporarily at end
-            ids.push(extraId);
-          }
-        }
-
-        // Add module shortcut actions that exist in visible map but not in order (safety)
-        for (const [id, vis] of Object.entries(state.panelPrefs.visible || {})) {
-          if (!ids.includes(id)) ids.push(id);
-        }
-
-        // Deduplicate
         const seen = new Set();
         const finalIds = [];
-        for (const id of ids) {
-          if (seen.has(id)) continue;
-          seen.add(id);
-          finalIds.push(id);
-        }
+        for (const id of ids) { if (!seen.has(id)) { seen.add(id); finalIds.push(id); } }
 
-        finalIds.forEach((actionId, idx) => {
+        finalIds.forEach((actionId) => {
           const def = ActionRegistry.get(actionId);
           if (!def) return;
 
@@ -2080,44 +2001,28 @@
             </div>
           `;
 
-          // move only if in order
           row.querySelector('[data-m="up"]').addEventListener("click", async () => {
-            if (!state.panelPrefs.order.includes(actionId)) {
-              // if not in order yet, add and place near end
-              state.panelPrefs.order.push(actionId);
-              await savePanelPrefs();
-            }
+            if (!state.panelPrefs.order.includes(actionId)) { state.panelPrefs.order.push(actionId); await savePanelPrefs(); }
             await panelMove(actionId, "up");
+            renderDashboard(); renderPanelSetup();
           });
           row.querySelector('[data-m="down"]').addEventListener("click", async () => {
-            if (!state.panelPrefs.order.includes(actionId)) {
-              state.panelPrefs.order.push(actionId);
-              await savePanelPrefs();
-            }
+            if (!state.panelPrefs.order.includes(actionId)) { state.panelPrefs.order.push(actionId); await savePanelPrefs(); }
             await panelMove(actionId, "down");
+            renderDashboard(); renderPanelSetup();
           });
 
           row.querySelector('[data-t="toggle"]').addEventListener("click", async () => {
-            // pinned cannot go off
-            if (pinned) {
-              await panelSetVisible(actionId, true);
-              return;
-            }
+            if (pinned) { await panelSetVisible(actionId, true); renderDashboard(); renderPanelSetup(); return; }
             await panelSetVisible(actionId, !on);
+            renderDashboard(); renderPanelSetup();
           });
 
           host.appendChild(row);
         });
       }
 
-      // =========================
-      //  MODULE STORE UI + shortcut toggle from Moduler
-      // =========================
-      function priceText(m) {
-        if (m.priceModel === "free") return "Gratis";
-        if (m.priceModel === "paid") return "Engangskjøp";
-        return "—";
-      }
+      function priceText(m) { return m.priceModel === "free" ? "Gratis" : (m.priceModel === "paid" ? "Engangskjøp" : "—"); }
 
       function isModuleShortcutOn(moduleId) {
         const actionId = `module.open:${moduleId}`;
@@ -2127,13 +2032,11 @@
       async function setModuleShortcut(moduleId, on) {
         const actionId = ensureModuleShortcutAction(moduleId);
         await panelSetVisible(actionId, on);
-        // ensure in order if on
         if (on && !state.panelPrefs.order.includes(actionId)) {
           state.panelPrefs.order.push(actionId);
           await savePanelPrefs();
         }
-        renderDashboard();
-        renderPanelSetup();
+        renderDashboard(); renderPanelSetup();
       }
 
       function renderModules() {
@@ -2146,7 +2049,6 @@
           const enabled = isEnabled(m.id);
           const allowed = licenseAllows(m.id) || m.priceModel === "free";
           const deps = (m.dependsOn || []).join(", ");
-
           const shortcutOn = isModuleShortcutOn(m.id);
 
           const row = document.createElement("div");
@@ -2175,7 +2077,6 @@
           row.querySelector('[data-act="unlock"]').addEventListener("click", () => openLicenseModal(m.id));
           row.querySelector('[data-act="toggle"]').addEventListener("click", async () => {
             if (!allowed && !enabled) { openLicenseModal(m.id); return; }
-            // deps check
             if (!enabled) {
               const depsArr = m.dependsOn || [];
               const missing = depsArr.filter(d => {
@@ -2196,9 +2097,6 @@
         }
       }
 
-      // =========================
-      //  WORKBENCH
-      // =========================
       function renderWork() {
         const host = $("#workHost");
         host.innerHTML = "";
@@ -2211,11 +2109,7 @@
         const api = {
           saveAndRefresh: async () => {
             await saveFarm();
-            renderWork();
-            renderKPIs();
-            renderDashboard();
-            renderPanelSetup();
-            renderModules();
+            renderWork(); renderKPIs(); renderDashboard(); renderPanelSetup(); renderModules();
           },
           openEditor,
           actions: createActions()
@@ -2223,7 +2117,6 @@
 
         for (const m of enabledModules) {
           const allowed = licenseAllows(m.id) || m.priceModel === "free";
-
           if (allowed && typeof m.dataPatch === "function") m.dataPatch(state.farmData);
 
           let results = null;
@@ -2326,25 +2219,20 @@
       async function loadOrCreate() {
         setStatus("Laster…");
 
+        await dbProbe();
+
         state.farmData = await dbGet(FARM_KEY) || createNewFarm();
+        registerBaseActions();
         state.licenses = await dbGet(LICENSE_KEY) || defaultLicenses();
         state.modulePrefs = await dbGet(MODULE_PREFS_KEY) || defaultModulePrefs();
-
-        // Ensure base actions exist (needs farm data for job action title/subtitle)
-        registerBaseActions();
-
         state.panelPrefs = normalizePanelPrefs(await dbGet(PANEL_PREFS_KEY) || defaultPanelPrefs());
 
-        // Always enable core
         state.modulePrefs["farm.core"] = { enabled: true };
         state.modulePrefs["area.core"] = { enabled: true };
-
-        // Ensure default free modules ON
         ["events.core","todo.core","shopping.core","timer.jobs"].forEach(id => state.modulePrefs[id] = { enabled:true });
 
         ensureDataPatched();
 
-        // Ensure module shortcut actions for any saved module shortcuts
         for (const actionId of Object.keys(state.panelPrefs.visible || {})) {
           if (actionId.startsWith("module.open:")) {
             const moduleId = actionId.split("module.open:")[1];
@@ -2353,7 +2241,6 @@
         }
 
         const v = validateCore(state.farmData);
-        setStatus(v.ok ? "Klar ✅" : "Datafeil – ta backup før vi fikser.");
 
         await dbSet(FARM_KEY, state.farmData);
         await dbSet(LICENSE_KEY, state.licenses);
@@ -2361,16 +2248,13 @@
         await dbSet(PANEL_PREFS_KEY, state.panelPrefs);
 
         syncFarmToForm();
-        renderKPIs();
-        renderModules();
-        renderWork();
-        renderDashboard();
-        renderPanelSetup();
-        renderTestModuleSelect();
+        renderKPIs(); renderModules(); renderWork(); renderDashboard(); renderPanelSetup(); renderTestModuleSelect();
+
+        setStatus(v.ok ? `Klar ✅ (${storageMode})` : "Datafeil – ta backup før vi fikser.");
       }
 
       // =========================
-      //  ROUTING BUTTONS
+      //  WIRE UI
       // =========================
       function wireUI() {
         $$("#tabs .tab").forEach(b => b.addEventListener("click", () => routeTo(b.dataset.route)));
@@ -2387,7 +2271,6 @@
           await saveFarm();
           syncFarmToForm();
           renderKPIs(); renderDashboard(); renderWork(); renderModules(); renderPanelSetup();
-          setStatus("Lagret ✅");
         });
 
         ["#farmName","#areaDyrket","#areaBeite","#areaUtmark"].forEach(id => {
@@ -2423,15 +2306,13 @@
           closeLicenseModal();
         });
 
-        $("#editorOverlayBg").addEventListener("click", closeEditor);
-        $("#btnEditorCancel").addEventListener("click", closeEditor);
+        $("#editorOverlayBg").addEventListener("click", () => closeEditor(true));
+        $("#btnEditorCancel").addEventListener("click", () => closeEditor(true));
         $("#btnEditorSave").addEventListener("click", async () => {
-          if (!state.editor.onSave || !state.editor.value) { closeEditor(); return; }
+          if (!state.editor.onSave || !state.editor.value) { closeEditor(false); return; }
           await state.editor.onSave(state.editor.value);
-          closeEditor();
-          // UI might change (job toggle title etc.)
-          renderDashboard();
-          renderPanelSetup();
+          closeEditor(false);
+          renderDashboard(); renderPanelSetup();
         });
       }
 
@@ -2442,5 +2323,4 @@
     })();
   </script>
 </body>
-</html>
-```0
+</html> 
