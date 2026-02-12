@@ -2450,7 +2450,21 @@ window.addEventListener("unhandledrejection", function (ev) {
     console.error(ev);
   } catch {}
 });
-// --- SLUTT PATCH 1 ---
+// --- SLUTT PATCH 1 ---// --- PATCH 2: Trygg oppstart hvis boot feiler ---
+(function(){
+  const originalBoot = window.boot;
+  if (typeof originalBoot === "function") {
+    window.boot = async function(){
+      try {
+        await originalBoot();
+      } catch (e) {
+        alert("Appen startet ikke riktig. Lager ny gård.");
+        console.error(e);
+        location.reload();
+      }
+    };
+  }
+})();
   </script>
 </body>
 </html>
