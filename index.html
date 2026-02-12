@@ -968,7 +968,6 @@
               notes: draft.notes
             },
             onCancel: () => {
-              // remove if empty
               const first = items[0];
               if(first && first.id === draft.id){
                 const sum = (first.areas.fulldyrket||0)+(first.areas.overflatedyrket||0)+(first.areas.innmarksbeite||0);
@@ -999,7 +998,6 @@
         },
 
         editField: (field) => {
-          const items = farm.farm.modules.fields.items;
           openEditor({
             title: "Rediger skifte",
             subtitle: "Endre navn og arealfordeling (daa).",
@@ -1045,7 +1043,6 @@
           const idx = items.findIndex(x => x.id === field.id);
           if(idx >= 0) items.splice(idx, 1);
 
-          // remove related entries in fieldPlan
           const fp = farm.farm.modules.fieldPlan;
           fp.fertilizerPlan = fp.fertilizerPlan.filter(e => e.fieldId !== field.id);
           fp.fertilizerLog  = fp.fertilizerLog.filter(e => e.fieldId !== field.id);
@@ -1142,12 +1139,10 @@
               const product = String(cur.product||"").trim();
               if(!product){ alert("Skriv minst Produkt/Middel før lagring."); return; }
 
-              // ensure scope options valid for selected field
               const f = fields.find(x => x.id === cur.fieldId) || firstField;
               const allowedScopes = new Set(scopeOptionsForField(f).map(x => x[0]));
               if(!allowedScopes.has(cur.scope)) cur.scope = "whole";
 
-              // Write to plant protection journal
               const pp = farm.farm.modules.fieldPlan.plantProtectionLog;
               pp.unshift({
                 id: uuid(),
@@ -1179,9 +1174,6 @@
               if(goWork) routeTo("work");
             }
           });
-
-          // dynamic scope options when field changes
-          // (simple approach: we validate on save; keeps editor minimal/robust)
         },
 
         newTodo: async (goWork) => {
@@ -1694,7 +1686,6 @@
       }
 
       function renderKPIs(){
-        const totals = fieldTotals();
         $("#kpiUpdatedAt").textContent = fmtDateTime(farm.meta.updatedAt);
         $("#kpiFieldCount").textContent = String(farm.farm.modules.fields.items.length);
         $("#kpiEventCount").textContent = String(farm.farm.modules.events.entries.length);
@@ -1827,7 +1818,6 @@
             if(!confirm("Slette sprøyting? (Fjerner ikke plantevernjournal-linja hvis den ble redigert manuelt etterpå.)")) return;
             const removed = sp.entries.splice(i,1)[0];
 
-            // remove plantProtection entries where sourceId matches and source="spraying"
             const pp = farm.farm.modules.fieldPlan.plantProtectionLog;
             farm.farm.modules.fieldPlan.plantProtectionLog = pp.filter(e => !(e.source==="spraying" && e.sourceId===removed.id));
 
@@ -2434,37 +2424,7 @@
       }
 
       document.addEventListener("DOMContentLoaded", boot);
-    })();// --- PATCH 1: Global feilhåndtering ---
-window.addEventListener("error", function (ev) {
-  try {
-    const msg = ev?.error?.message || ev?.message || "Ukjent feil";
-    alert("Feil i appen: " + msg);
-    console.error(ev);
-  } catch {}
-});
-
-window.addEventListener("unhandledrejection", function (ev) {
-  try {
-    const msg = ev?.reason?.message || String(ev?.reason || "Ukjent promise-feil");
-    alert("Feil i appen: " + msg);
-    console.error(ev);
-  } catch {}
-});
-// --- SLUTT PATCH 1 ---// --- PATCH 2: Trygg oppstart hvis boot feiler ---
-(function(){
-  const originalBoot = window.boot;
-  if (typeof originalBoot === "function") {
-    window.boot = async function(){
-      try {
-        await originalBoot();
-      } catch (e) {
-        alert("Appen startet ikke riktig. Lager ny gård.");
-        console.error(e);
-        location.reload();
-      }
-    };
-  }
-})();
+    })();
   </script>
 </body>
 </html>
