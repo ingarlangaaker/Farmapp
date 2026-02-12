@@ -2434,7 +2434,23 @@
       }
 
       document.addEventListener("DOMContentLoaded", boot);
-    })();
+    })();// --- PATCH 1: Global feilhåndtering ---
+window.addEventListener("error", function (ev) {
+  try {
+    const msg = ev?.error?.message || ev?.message || "Ukjent feil";
+    alert("Feil i appen: " + msg);
+    console.error(ev);
+  } catch {}
+});
+
+window.addEventListener("unhandledrejection", function (ev) {
+  try {
+    const msg = ev?.reason?.message || String(ev?.reason || "Ukjent promise-feil");
+    alert("Feil i appen: " + msg);
+    console.error(ev);
+  } catch {}
+});
+// --- SLUTT PATCH 1 ---
   </script>
 </body>
 </html>
